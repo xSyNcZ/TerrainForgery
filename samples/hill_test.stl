@@ -1,4 +1,4 @@
-solid TerrainForgery
+solid BoardMesh Studio
   facet normal 0 0 1
     outer loop
       vertex -60 -60 0
@@ -67199,4 +67199,4 @@ solid TerrainForgery
       vertex 60 60 0
     endloop
   endfacet
-endsolid TerrainForgery
+endsolid BoardMesh Studio

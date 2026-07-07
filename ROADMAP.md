@@ -1,10 +1,10 @@
-# TerrainForgery Roadmap
+# BoardMesh Studio Roadmap
 
 ## Project Vision
 
-TerrainForgery is planned as a desktop tool for procedurally generating 3D printable tabletop terrain and battlefield layouts. It should support both individual terrain pieces and complete playable battlefields, with a workflow focused on tabletop wargaming, STL export, scale-aware design, 3D printing, and approachable user editing.
+BoardMesh Studio is planned as a desktop tool for procedurally generating 3D printable tabletop terrain and battlefield layouts. It should support both individual terrain pieces and complete playable battlefields, with a workflow focused on tabletop wargaming, STL export, scale-aware design, 3D printing, and approachable user editing.
 
-The long-term goal is not to become a full 3D modeling suite. TerrainForgery should remain a focused generator and planning assistant: fast to use, deterministic when needed, easy to preview, and practical for preparing printable terrain.
+The long-term goal is not to become a full 3D modeling suite. BoardMesh Studio should remain a focused generator and planning assistant: fast to use, deterministic when needed, easy to preview, and practical for preparing printable terrain.
 
 ## Development Principles
 
@@ -660,7 +660,7 @@ Editing should remain simple, fast, and friendly. This is not intended to be a f
 **Example package structure:**
 
 ```text
-TerrainForgery_IndustrialMap_24x32.zip
+BoardMeshStudio_IndustrialMap_24x32.zip
 |-- project.tforge
 |-- preview.png
 |-- README.txt
@@ -776,7 +776,7 @@ Symmetry options:
 
 ### Map Playability Score
 
-TerrainForgery should eventually score maps for:
+BoardMesh Studio should eventually score maps for:
 
 - Cover: good / too low / too high
 - Line of sight: too open / balanced / too blocked

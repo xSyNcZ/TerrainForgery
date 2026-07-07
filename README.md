@@ -1,6 +1,6 @@
-# TerrainForgery
+# BoardMesh Studio
 
-TerrainForgery is a C# project for procedural generation of 3D printable tabletop terrain models.
+BoardMesh Studio is a C# project for procedural generation of 3D printable tabletop terrain models.
 
 ## Current Milestone: MVP-0
 
@@ -15,7 +15,7 @@ See [ROADMAP.md](ROADMAP.md) for the planned milestones from MVP-0 to v1.0.
 ## Run the CLI
 
 ```powershell
-dotnet run --project src/TerrainForgery.Cli
+dotnet run --project src/BoardMeshStudio.Cli
 ```
 
 The command creates:
