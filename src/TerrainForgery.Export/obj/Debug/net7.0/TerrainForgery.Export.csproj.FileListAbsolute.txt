@@ -1,0 +1,15 @@
+C:\Users\USER\eclipse-workspace\TerrainForgery\src\TerrainForgery.Export\bin\Debug\net7.0\TerrainForgery.Export.deps.json
+C:\Users\USER\eclipse-workspace\TerrainForgery\src\TerrainForgery.Export\bin\Debug\net7.0\TerrainForgery.Export.dll
+C:\Users\USER\eclipse-workspace\TerrainForgery\src\TerrainForgery.Export\bin\Debug\net7.0\TerrainForgery.Export.pdb
+C:\Users\USER\eclipse-workspace\TerrainForgery\src\TerrainForgery.Export\bin\Debug\net7.0\TerrainForgery.Core.dll
+C:\Users\USER\eclipse-workspace\TerrainForgery\src\TerrainForgery.Export\bin\Debug\net7.0\TerrainForgery.Core.pdb
+C:\Users\USER\eclipse-workspace\TerrainForgery\src\TerrainForgery.Export\obj\Debug\net7.0\TerrainForgery.Export.csproj.AssemblyReference.cache
+C:\Users\USER\eclipse-workspace\TerrainForgery\src\TerrainForgery.Export\obj\Debug\net7.0\TerrainForgery.Export.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\USER\eclipse-workspace\TerrainForgery\src\TerrainForgery.Export\obj\Debug\net7.0\TerrainForgery.Export.AssemblyInfoInputs.cache
+C:\Users\USER\eclipse-workspace\TerrainForgery\src\TerrainForgery.Export\obj\Debug\net7.0\TerrainForgery.Export.AssemblyInfo.cs
+C:\Users\USER\eclipse-workspace\TerrainForgery\src\TerrainForgery.Export\obj\Debug\net7.0\TerrainForgery.Export.csproj.CoreCompileInputs.cache
+C:\Users\USER\eclipse-workspace\TerrainForgery\src\TerrainForgery.Export\obj\Debug\net7.0\TerrainForgery.Export.csproj.CopyComplete
+C:\Users\USER\eclipse-workspace\TerrainForgery\src\TerrainForgery.Export\obj\Debug\net7.0\TerrainForgery.Export.dll
+C:\Users\USER\eclipse-workspace\TerrainForgery\src\TerrainForgery.Export\obj\Debug\net7.0\refint\TerrainForgery.Export.dll
+C:\Users\USER\eclipse-workspace\TerrainForgery\src\TerrainForgery.Export\obj\Debug\net7.0\TerrainForgery.Export.pdb
+C:\Users\USER\eclipse-workspace\TerrainForgery\src\TerrainForgery.Export\obj\Debug\net7.0\ref\TerrainForgery.Export.dll

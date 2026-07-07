@@ -1,0 +1,11 @@
+C:\Users\USER\eclipse-workspace\TerrainForgery\src\TerrainForgery.Core\bin\Debug\net7.0\TerrainForgery.Core.deps.json
+C:\Users\USER\eclipse-workspace\TerrainForgery\src\TerrainForgery.Core\bin\Debug\net7.0\TerrainForgery.Core.dll
+C:\Users\USER\eclipse-workspace\TerrainForgery\src\TerrainForgery.Core\bin\Debug\net7.0\TerrainForgery.Core.pdb
+C:\Users\USER\eclipse-workspace\TerrainForgery\src\TerrainForgery.Core\obj\Debug\net7.0\TerrainForgery.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\USER\eclipse-workspace\TerrainForgery\src\TerrainForgery.Core\obj\Debug\net7.0\TerrainForgery.Core.AssemblyInfoInputs.cache
+C:\Users\USER\eclipse-workspace\TerrainForgery\src\TerrainForgery.Core\obj\Debug\net7.0\TerrainForgery.Core.AssemblyInfo.cs
+C:\Users\USER\eclipse-workspace\TerrainForgery\src\TerrainForgery.Core\obj\Debug\net7.0\TerrainForgery.Core.csproj.CoreCompileInputs.cache
+C:\Users\USER\eclipse-workspace\TerrainForgery\src\TerrainForgery.Core\obj\Debug\net7.0\TerrainForgery.Core.dll
+C:\Users\USER\eclipse-workspace\TerrainForgery\src\TerrainForgery.Core\obj\Debug\net7.0\refint\TerrainForgery.Core.dll
+C:\Users\USER\eclipse-workspace\TerrainForgery\src\TerrainForgery.Core\obj\Debug\net7.0\TerrainForgery.Core.pdb
+C:\Users\USER\eclipse-workspace\TerrainForgery\src\TerrainForgery.Core\obj\Debug\net7.0\ref\TerrainForgery.Core.dll

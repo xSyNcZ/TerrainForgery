@@ -1,0 +1,36 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v7.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v7.0": {
+      "TerrainForgery.Export/1.0.0": {
+        "dependencies": {
+          "TerrainForgery.Core": "1.0.0"
+        },
+        "runtime": {
+          "TerrainForgery.Export.dll": {}
+        }
+      },
+      "TerrainForgery.Core/1.0.0": {
+        "runtime": {
+          "TerrainForgery.Core.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "TerrainForgery.Export/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "TerrainForgery.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
