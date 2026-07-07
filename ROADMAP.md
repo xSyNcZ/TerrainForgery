@@ -89,6 +89,70 @@ The long-term goal is not to become a full 3D modeling suite. BoardMesh Studio s
 
 **Status:** Current
 
+#### v0.1.x - Desktop Preview Refinement Backlog
+
+These patch milestones refine the first desktop preview before the larger scale and board systems start in v0.2.
+
+| Version | Focus | Status |
+| --- | --- | --- |
+| v0.1.1 | Base toggle | Planned |
+| v0.1.2 | Triangle budget controls | Planned |
+| v0.1.3 | Terrain precision and quality pass | Planned |
+| v0.1.4 | Visual style presets | Planned |
+
+##### v0.1.1 - Base Toggle
+
+**Goal:** allow users to generate terrain either with a printable base or without a base.
+
+**Scope:**
+
+- Add a "with base / without base" option to generator settings.
+- Make base thickness optional per generated object.
+- Ensure STL export remains valid for both modes.
+- Keep the preview and triangle stats accurate after toggling the base.
+
+##### v0.1.2 - Triangle Budget Controls
+
+**Goal:** allow users to control how many triangles the generated terrain should use.
+
+**Scope:**
+
+- Add a triangle budget or quality-level control in the UI.
+- Map the requested triangle count to generator resolution where possible.
+- Show estimated and actual triangle counts.
+- Prevent settings that create unusably heavy meshes for the preview app.
+
+##### v0.1.3 - Terrain Precision and Quality Pass
+
+**Goal:** improve the precision, consistency, and overall quality of generated terrain.
+
+**Scope:**
+
+- Improve height falloff and surface shaping.
+- Reduce unwanted artifacts and overly flat areas.
+- Improve normals, mesh consistency, and STL export quality.
+- Add generator-specific quality checks where useful.
+- Prefer deterministic improvements that preserve seed-based generation.
+
+##### v0.1.4 - Visual Style Presets
+
+**Goal:** introduce style presets that influence generated terrain shapes.
+
+**Initial style ideas:**
+
+- Realistic
+- Stylized
+- Anime-inspired
+- Miniature-friendly
+- Low-poly
+- Rugged / natural
+
+**Scope:**
+
+- Add a style selection control.
+- Let style presets affect shape language, exaggeration, smoothness, and detail density.
+- Keep styles generic and avoid references to specific copyrighted franchises or game systems.
+
 ### v0.2 - Scale System
 
 **Goal:** add model scale support so generated terrain has sensible dimensions for different miniature games.
