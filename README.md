@@ -8,6 +8,10 @@ MVP-0 is a simple console application. It generates a closed procedural hill mes
 
 There is no UI yet. The current code focuses on core geometry, hill generation, and STL export.
 
+## Roadmap
+
+See [ROADMAP.md](ROADMAP.md) for the planned milestones from MVP-0 to v1.0.
+
 ## Run the CLI
 
 ```powershell
