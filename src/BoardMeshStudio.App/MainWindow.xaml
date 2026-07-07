@@ -1,0 +1,116 @@
+<Window x:Class="BoardMeshStudio.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="BoardMesh Studio"
+        Width="1280"
+        Height="820"
+        MinWidth="1040"
+        MinHeight="680"
+        Background="#20242A">
+    <Window.Resources>
+        <Style x:Key="LabelTextBlockStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#AEB7C2" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,0,0,4" />
+        </Style>
+        <Style x:Key="ValueTextBlockStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#F3F5F7" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Margin" Value="0,0,0,14" />
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="34" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="292" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="280" />
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Row="0" Grid.Column="0" Background="#252B33" BorderBrush="#39414C" BorderThickness="0,0,1,0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="16">
+                    <TextBlock Text="BoardMesh Studio" FontSize="24" FontWeight="SemiBold" Foreground="#F3F5F7" />
+                    <TextBlock Text="v0.1 desktop preview" Margin="0,4,0,18" Foreground="#AEB7C2" />
+
+                    <TextBlock Text="Generator" Style="{StaticResource LabelTextBlockStyle}" />
+                    <ComboBox x:Name="GeneratorComboBox" SelectedIndex="0" Margin="0,4,0,12">
+                        <ComboBoxItem Content="Hill" />
+                        <ComboBoxItem Content="Crater" />
+                        <ComboBoxItem Content="Rock" />
+                        <ComboBoxItem Content="Wall" />
+                        <ComboBoxItem Content="Block building" />
+                    </ComboBox>
+
+                    <TextBlock Text="Width (mm)" Style="{StaticResource LabelTextBlockStyle}" />
+                    <TextBox x:Name="WidthTextBox" Text="120" Margin="0,4,0,10" />
+
+                    <TextBlock Text="Depth (mm)" Style="{StaticResource LabelTextBlockStyle}" />
+                    <TextBox x:Name="DepthTextBox" Text="120" Margin="0,4,0,10" />
+
+                    <TextBlock Text="Height (mm)" Style="{StaticResource LabelTextBlockStyle}" />
+                    <TextBox x:Name="HeightTextBox" Text="30" Margin="0,4,0,10" />
+
+                    <TextBlock Text="Resolution" Style="{StaticResource LabelTextBlockStyle}" />
+                    <TextBox x:Name="ResolutionTextBox" Text="48" Margin="0,4,0,10" />
+
+                    <TextBlock Text="Noise strength" Style="{StaticResource LabelTextBlockStyle}" />
+                    <TextBox x:Name="NoiseTextBox" Text="1.75" Margin="0,4,0,10" />
+
+                    <TextBlock Text="Seed" Style="{StaticResource LabelTextBlockStyle}" />
+                    <TextBox x:Name="SeedTextBox" Text="20260707" Margin="0,4,0,10" />
+
+                    <TextBlock Text="Base thickness (mm)" Style="{StaticResource LabelTextBlockStyle}" />
+                    <TextBox x:Name="BaseThicknessTextBox" Text="5" Margin="0,4,0,18" />
+
+                    <Button Content="Generate" Height="34" Click="GenerateButton_Click" />
+                    <Button Content="Export STL" Height="34" Margin="0,8,0,0" Click="ExportButton_Click" />
+                    <Button Content="Reset camera" Height="34" Margin="0,8,0,0" Click="ResetCameraButton_Click" />
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <Grid Grid.Row="0" Grid.Column="1" Background="#1B1F24">
+            <Viewport3D x:Name="PreviewViewport"
+                        ClipToBounds="True"
+                        MouseDown="PreviewViewport_MouseDown"
+                        MouseMove="PreviewViewport_MouseMove"
+                        MouseUp="PreviewViewport_MouseUp"
+                        MouseWheel="PreviewViewport_MouseWheel">
+                <Viewport3D.Camera>
+                    <PerspectiveCamera x:Name="PreviewCamera" FieldOfView="45" />
+                </Viewport3D.Camera>
+            </Viewport3D>
+            <Border HorizontalAlignment="Left" VerticalAlignment="Top" Margin="16" Padding="10,6" Background="#CC252B33" CornerRadius="4">
+                <TextBlock Text="Left drag: orbit  |  Right drag: pan  |  Wheel: zoom" Foreground="#DDE3EA" />
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="0" Grid.Column="2" Background="#252B33" BorderBrush="#39414C" BorderThickness="1,0,0,0">
+            <StackPanel Margin="16">
+                <TextBlock Text="Selected Object" FontSize="18" FontWeight="SemiBold" Foreground="#F3F5F7" />
+                <TextBlock Text="Generated terrain mesh" Margin="0,4,0,18" Foreground="#AEB7C2" />
+
+                <TextBlock Text="Generator" Style="{StaticResource LabelTextBlockStyle}" />
+                <TextBlock x:Name="GeneratorValueTextBlock" Text="Hill" Style="{StaticResource ValueTextBlockStyle}" />
+
+                <TextBlock Text="Triangle count" Style="{StaticResource LabelTextBlockStyle}" />
+                <TextBlock x:Name="TriangleCountTextBlock" Text="0" Style="{StaticResource ValueTextBlockStyle}" />
+
+                <TextBlock Text="Bounds" Style="{StaticResource LabelTextBlockStyle}" />
+                <TextBlock x:Name="BoundsTextBlock" Text="-" Style="{StaticResource ValueTextBlockStyle}" TextWrapping="Wrap" />
+
+                <TextBlock Text="Export target" Style="{StaticResource LabelTextBlockStyle}" />
+                <TextBlock x:Name="ExportPathTextBlock" Text="-" Style="{StaticResource ValueTextBlockStyle}" TextWrapping="Wrap" />
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="1" Grid.ColumnSpan="3" Background="#15181D" BorderBrush="#39414C" BorderThickness="0,1,0,0">
+            <TextBlock x:Name="StatusTextBlock" Text="Ready" VerticalAlignment="Center" Margin="12,0" Foreground="#DDE3EA" />
+        </Border>
+    </Grid>
+</Window>

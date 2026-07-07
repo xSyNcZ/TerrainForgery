@@ -21,8 +21,8 @@ The long-term goal is not to become a full 3D modeling suite. BoardMesh Studio s
 
 | Version | Milestone | Focus | Status |
 | --- | --- | --- | --- |
-| v0.0.1 | MVP-0 | Core STL generation | Current / In Progress |
-| v0.1 | Desktop Preview App | Single-object preview and export | Planned |
+| v0.0.1 | MVP-0 | Core STL generation | Completed |
+| v0.1 | Desktop Preview App | Single-object preview and export | Current |
 | v0.2 | Scale System | Scale-aware generation | Planned |
 | v0.3 | Board Size System | Inch-based board planning | Planned |
 | v0.4 | Terrain Object Library | Terrain metadata and categories | Planned |
@@ -60,7 +60,7 @@ The long-term goal is not to become a full 3D modeling suite. BoardMesh Studio s
 
 **Expected result:** running the CLI creates `samples/hill_test.stl`.
 
-**Status:** Current / In Progress
+**Status:** Completed
 
 ### v0.1 - Desktop Preview App
 
@@ -68,20 +68,26 @@ The long-term goal is not to become a full 3D modeling suite. BoardMesh Studio s
 
 **Scope:**
 
-- WPF application
-- Basic 3D preview
-- Camera orbit, zoom, pan, and reset
-- Generate button
-- Export STL button
-- Parameter panel for one generator
+- [x] WPF application
+- [x] Basic 3D preview
+- [x] Camera orbit, zoom, pan, and reset
+- [x] Generate button
+- [x] Export STL button
+- [x] Parameter panel for one generated object
+- [x] Mesh bounds and triangle-count status
+- [x] Core tests for generator creation and mesh bounds
 
 **Initial generators:**
 
-- Hill
-- Crater
-- Rock
-- Simple wall
-- Simple block / building placeholder
+- [x] Hill
+- [x] Crater
+- [x] Rock
+- [x] Simple wall
+- [x] Simple block / building placeholder
+
+**Expected result:** running the desktop app opens a native WPF preview window where a generated terrain object can be viewed, regenerated, navigated with the camera, and exported as STL.
+
+**Status:** Current
 
 ### v0.2 - Scale System
 
@@ -874,10 +880,10 @@ A future PDF or PNG build sheet could include:
 
 ## Immediate Next Steps
 
-1. MVP-0: Console-generated STL hill.
-2. MVP-1: WPF preview for a single object.
+1. MVP-0: Console-generated STL hill. Completed.
+2. MVP-1: WPF preview for a single object. Current.
 3. MVP-2: Scale and board system.
-4. MVP-3: Multiple terrain generators.
+4. MVP-3: More robust terrain generator controls.
 5. MVP-4: Random terrain pack generator.
 6. MVP-5: Full map draft generator.
 

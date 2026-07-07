@@ -2,7 +2,7 @@ using BoardMeshStudio.Core.Geometry;
 
 namespace BoardMeshStudio.Core.Generators;
 
-public sealed class HillGenerator : ITerrainGenerator
+public sealed class CraterGenerator : ITerrainGenerator
 {
     public Mesh Generate(HillGenerationSettings settings)
     {
@@ -34,14 +34,9 @@ public sealed class HillGenerator : ITerrainGenerator
             throw new ArgumentException("Width, Depth, and Height must be greater than zero.", nameof(settings));
         }
 
-        if (settings.NoiseStrength < 0)
+        if (settings.NoiseStrength < 0 || settings.BaseThickness < 0)
         {
-            throw new ArgumentException("NoiseStrength cannot be negative.", nameof(settings));
-        }
-
-        if (settings.BaseThickness < 0)
-        {
-            throw new ArgumentException("BaseThickness cannot be negative.", nameof(settings));
+            throw new ArgumentException("NoiseStrength and BaseThickness cannot be negative.", nameof(settings));
         }
     }
 
@@ -57,10 +52,12 @@ public sealed class HillGenerator : ITerrainGenerator
                 var worldY = -settings.Depth / 2.0 + settings.Depth * y / settings.Resolution;
                 var normalizedX = worldX / (settings.Width / 2.0);
                 var normalizedY = worldY / (settings.Depth / 2.0);
-                var radialDistanceSquared = normalizedX * normalizedX + normalizedY * normalizedY;
-                var falloff = Math.Max(0.0, 1.0 - radialDistanceSquared);
-                var noise = (random.NextDouble() * 2.0 - 1.0) * settings.NoiseStrength * falloff;
-                var z = Math.Max(0.0, settings.Height * falloff + noise);
+                var radius = Math.Sqrt(normalizedX * normalizedX + normalizedY * normalizedY);
+                var rim = settings.Height * 0.35 * Math.Exp(-Math.Pow((radius - 0.68) * 5.0, 2.0));
+                var bowl = settings.Height * 0.28 * Math.Max(0.0, 1.0 - radius * radius);
+                var edgeBlend = Math.Max(0.0, 1.0 - radius);
+                var noise = (random.NextDouble() * 2.0 - 1.0) * settings.NoiseStrength * edgeBlend;
+                var z = Math.Max(-settings.BaseThickness * 0.5, rim - bowl + noise);
 
                 points[x, y] = new Vertex(worldX, worldY, z);
             }
@@ -80,7 +77,6 @@ public sealed class HillGenerator : ITerrainGenerator
             {
                 var worldX = -settings.Width / 2.0 + settings.Width * x / settings.Resolution;
                 var worldY = -settings.Depth / 2.0 + settings.Depth * y / settings.Resolution;
-
                 points[x, y] = new Vertex(worldX, worldY, bottomZ);
             }
         }
@@ -98,7 +94,6 @@ public sealed class HillGenerator : ITerrainGenerator
                 var p10 = top[x + 1, y];
                 var p01 = top[x, y + 1];
                 var p11 = top[x + 1, y + 1];
-
                 mesh.AddTriangle(p00, p10, p11);
                 mesh.AddTriangle(p00, p11, p01);
             }
@@ -115,7 +110,6 @@ public sealed class HillGenerator : ITerrainGenerator
                 var p10 = bottom[x + 1, y];
                 var p01 = bottom[x, y + 1];
                 var p11 = bottom[x + 1, y + 1];
-
                 mesh.AddTriangle(p00, p11, p10);
                 mesh.AddTriangle(p00, p01, p11);
             }
