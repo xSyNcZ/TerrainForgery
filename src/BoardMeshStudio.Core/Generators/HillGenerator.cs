@@ -6,6 +6,7 @@ public sealed class HillGenerator : ITerrainGenerator
 {
     public Mesh Generate(HillGenerationSettings settings)
     {
+        settings = TriangleBudgetResolver.Apply(settings);
         Validate(settings);
 
         var random = new Random(settings.Seed);
@@ -48,6 +49,7 @@ public sealed class HillGenerator : ITerrainGenerator
     private static Vertex[,] CreateTopSurface(HillGenerationSettings settings, Random random)
     {
         var points = new Vertex[settings.Resolution + 1, settings.Resolution + 1];
+        var profile = TerrainStyleProfile.From(settings.Style);
 
         for (var y = 0; y <= settings.Resolution; y++)
         {
@@ -58,9 +60,9 @@ public sealed class HillGenerator : ITerrainGenerator
                 var normalizedX = worldX / (settings.Width / 2.0);
                 var normalizedY = worldY / (settings.Depth / 2.0);
                 var radialDistanceSquared = normalizedX * normalizedX + normalizedY * normalizedY;
-                var falloff = Math.Max(0.0, 1.0 - radialDistanceSquared);
-                var noise = (random.NextDouble() * 2.0 - 1.0) * settings.NoiseStrength * falloff;
-                var z = Math.Max(0.0, settings.Height * falloff + noise);
+                var falloff = Math.Pow(Math.Max(0.0, 1.0 - radialDistanceSquared), profile.ShapeExponent);
+                var noise = (random.NextDouble() * 2.0 - 1.0) * settings.NoiseStrength * profile.NoiseMultiplier * falloff;
+                var z = Math.Max(0.0, settings.Height * profile.HeightMultiplier * falloff + noise);
 
                 points[x, y] = new Vertex(worldX, worldY, z);
             }
@@ -72,7 +74,7 @@ public sealed class HillGenerator : ITerrainGenerator
     private static Vertex[,] CreateBottomSurface(HillGenerationSettings settings)
     {
         var points = new Vertex[settings.Resolution + 1, settings.Resolution + 1];
-        var bottomZ = -settings.BaseThickness;
+        var bottomZ = -settings.EffectiveBaseThickness;
 
         for (var y = 0; y <= settings.Resolution; y++)
         {

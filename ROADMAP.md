@@ -95,8 +95,8 @@ These patch milestones refine the first desktop preview before the larger scale 
 
 | Version | Focus | Status |
 | --- | --- | --- |
-| v0.1.1 | Base toggle | Planned |
-| v0.1.2 | Triangle budget controls | Planned |
+| v0.1.1 | Base toggle | Completed |
+| v0.1.2 | Triangle budget controls | Completed |
 | v0.1.3 | Terrain precision and quality pass | Planned |
 | v0.1.4 | Visual style presets | Planned |
 
@@ -106,10 +106,12 @@ These patch milestones refine the first desktop preview before the larger scale 
 
 **Scope:**
 
-- Add a "with base / without base" option to generator settings.
-- Make base thickness optional per generated object.
-- Ensure STL export remains valid for both modes.
-- Keep the preview and triangle stats accurate after toggling the base.
+- [x] Add a "with base / without base" option to generator settings.
+- [x] Make base thickness optional per generated object.
+- [x] Ensure STL export remains valid for both modes.
+- [x] Keep the preview and triangle stats accurate after toggling the base.
+
+**Status:** Completed
 
 ##### v0.1.2 - Triangle Budget Controls
 
@@ -117,10 +119,12 @@ These patch milestones refine the first desktop preview before the larger scale 
 
 **Scope:**
 
-- Add a triangle budget or quality-level control in the UI.
-- Map the requested triangle count to generator resolution where possible.
-- Show estimated and actual triangle counts.
-- Prevent settings that create unusably heavy meshes for the preview app.
+- [x] Add a triangle budget control in the UI.
+- [x] Map the requested triangle count to generator resolution where possible.
+- [x] Show target and actual triangle counts.
+- [x] Clamp generated grid resolution to preview-safe limits.
+
+**Status:** Completed
 
 ##### v0.1.3 - Terrain Precision and Quality Pass
 
@@ -128,11 +132,14 @@ These patch milestones refine the first desktop preview before the larger scale 
 
 **Scope:**
 
-- Improve height falloff and surface shaping.
-- Reduce unwanted artifacts and overly flat areas.
-- Improve normals, mesh consistency, and STL export quality.
-- Add generator-specific quality checks where useful.
-- Prefer deterministic improvements that preserve seed-based generation.
+- [ ] Improve height falloff and surface shaping.
+- [ ] Reduce unwanted artifacts and overly flat areas.
+- [ ] Improve normals, mesh consistency, and STL export quality where needed.
+- [ ] Add generator-specific quality checks where useful.
+- [ ] Preserve deterministic seed-based generation.
+- [ ] Review generated STL files visually and iterate on terrain quality.
+
+**Status:** Planned
 
 ##### v0.1.4 - Visual Style Presets
 
@@ -140,18 +147,21 @@ These patch milestones refine the first desktop preview before the larger scale 
 
 **Initial style ideas:**
 
-- Realistic
-- Stylized
-- Anime-inspired
-- Miniature-friendly
-- Low-poly
-- Rugged / natural
+- [ ] Realistic
+- [ ] Stylized
+- [ ] Anime-inspired
+- [ ] Miniature-friendly
+- [ ] Low-poly
+- [ ] Rugged / natural
 
 **Scope:**
 
-- Add a style selection control.
-- Let style presets affect shape language, exaggeration, smoothness, and detail density.
-- Keep styles generic and avoid references to specific copyrighted franchises or game systems.
+- [ ] Add a style selection control.
+- [ ] Let style presets meaningfully affect shape language, exaggeration, smoothness, and detail density.
+- [ ] Make style differences visible enough to matter in generated terrain.
+- [ ] Keep styles generic and avoid references to specific copyrighted franchises or game systems.
+
+**Status:** Planned
 
 ### v0.2 - Scale System
 

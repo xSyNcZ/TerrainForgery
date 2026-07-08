@@ -90,7 +90,7 @@ public partial class MainWindow : Window
             _currentBounds = MeshBoundsCalculator.Calculate(mesh);
             RenderMesh(mesh);
             ResetCamera();
-            UpdateStats(generatorType, mesh, _currentBounds);
+            UpdateStats(generatorType, settings, mesh, _currentBounds);
             SetStatus($"Generated {generatorType} mesh with {mesh.Triangles.Count} triangles.");
         }
         catch (Exception exception)
@@ -108,9 +108,12 @@ public partial class MainWindow : Window
             Depth = ReadDouble(DepthTextBox, "Depth"),
             Height = ReadDouble(HeightTextBox, "Height"),
             Resolution = ReadInt(ResolutionTextBox, "Resolution"),
+            TargetTriangleCount = ReadOptionalInt(TargetTriangleCountTextBox, "Target triangles"),
             NoiseStrength = ReadDouble(NoiseTextBox, "Noise strength"),
             Seed = ReadInt(SeedTextBox, "Seed"),
-            BaseThickness = ReadDouble(BaseThicknessTextBox, "Base thickness")
+            BaseThickness = ReadDouble(BaseThicknessTextBox, "Base thickness"),
+            IncludeBase = IncludeBaseCheckBox.IsChecked == true,
+            Style = GetSelectedStyle()
         };
     }
 
@@ -139,6 +142,21 @@ public partial class MainWindow : Window
         throw new InvalidOperationException($"{label} must be an integer.");
     }
 
+    private static int? ReadOptionalInt(TextBox textBox, string label)
+    {
+        if (string.IsNullOrWhiteSpace(textBox.Text))
+        {
+            return null;
+        }
+
+        if (int.TryParse(textBox.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var value))
+        {
+            return value;
+        }
+
+        throw new InvalidOperationException($"{label} must be an integer.");
+    }
+
     private TerrainGeneratorType GetSelectedGeneratorType()
     {
         return GeneratorComboBox.SelectedIndex switch
@@ -149,6 +167,20 @@ public partial class MainWindow : Window
             3 => TerrainGeneratorType.Wall,
             4 => TerrainGeneratorType.BlockBuilding,
             _ => TerrainGeneratorType.Hill
+        };
+    }
+
+    private TerrainStyle GetSelectedStyle()
+    {
+        return StyleComboBox.SelectedIndex switch
+        {
+            0 => TerrainStyle.Realistic,
+            1 => TerrainStyle.Stylized,
+            2 => TerrainStyle.AnimeInspired,
+            3 => TerrainStyle.MiniatureFriendly,
+            4 => TerrainStyle.LowPoly,
+            5 => TerrainStyle.RuggedNatural,
+            _ => TerrainStyle.Realistic
         };
     }
 
@@ -200,10 +232,13 @@ public partial class MainWindow : Window
         return normal;
     }
 
-    private void UpdateStats(TerrainGeneratorType generatorType, CoreMesh mesh, MeshBounds bounds)
+    private void UpdateStats(TerrainGeneratorType generatorType, HillGenerationSettings settings, CoreMesh mesh, MeshBounds bounds)
     {
         GeneratorValueTextBlock.Text = generatorType.ToString();
+        StyleValueTextBlock.Text = settings.Style.ToString();
+        BaseValueTextBlock.Text = settings.IncludeBase ? "With base" : "Without base";
         TriangleCountTextBlock.Text = mesh.Triangles.Count.ToString(CultureInfo.InvariantCulture);
+        TargetTriangleCountValueTextBlock.Text = settings.TargetTriangleCount?.ToString(CultureInfo.InvariantCulture) ?? "-";
         BoundsTextBlock.Text = string.Format(
             CultureInfo.InvariantCulture,
             "{0:0.#} x {1:0.#} x {2:0.#} mm",

@@ -8,7 +8,8 @@ public sealed class BlockBuildingGenerator : ITerrainGenerator
     {
         Validate(settings);
 
-        return BoxMeshBuilder.CreateBox(settings.Width, settings.Depth, settings.Height, -settings.BaseThickness);
+        var profile = TerrainStyleProfile.From(settings.Style);
+        return BoxMeshBuilder.CreateBox(settings.Width, settings.Depth, settings.Height * profile.HeightMultiplier, -settings.EffectiveBaseThickness);
     }
 
     private static void Validate(HillGenerationSettings settings)

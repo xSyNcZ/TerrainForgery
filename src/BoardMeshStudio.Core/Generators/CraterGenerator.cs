@@ -6,6 +6,7 @@ public sealed class CraterGenerator : ITerrainGenerator
 {
     public Mesh Generate(HillGenerationSettings settings)
     {
+        settings = TriangleBudgetResolver.Apply(settings);
         Validate(settings);
 
         var random = new Random(settings.Seed);
@@ -43,6 +44,7 @@ public sealed class CraterGenerator : ITerrainGenerator
     private static Vertex[,] CreateTopSurface(HillGenerationSettings settings, Random random)
     {
         var points = new Vertex[settings.Resolution + 1, settings.Resolution + 1];
+        var profile = TerrainStyleProfile.From(settings.Style);
 
         for (var y = 0; y <= settings.Resolution; y++)
         {
@@ -53,11 +55,13 @@ public sealed class CraterGenerator : ITerrainGenerator
                 var normalizedX = worldX / (settings.Width / 2.0);
                 var normalizedY = worldY / (settings.Depth / 2.0);
                 var radius = Math.Sqrt(normalizedX * normalizedX + normalizedY * normalizedY);
-                var rim = settings.Height * 0.35 * Math.Exp(-Math.Pow((radius - 0.68) * 5.0, 2.0));
-                var bowl = settings.Height * 0.28 * Math.Max(0.0, 1.0 - radius * radius);
+                var rim = settings.Height * profile.HeightMultiplier * 0.35 * Math.Exp(-Math.Pow((radius - 0.68) * 5.0, 2.0));
+                var bowlShape = Math.Pow(Math.Max(0.0, 1.0 - radius * radius), profile.ShapeExponent);
+                var bowl = settings.Height * profile.HeightMultiplier * 0.28 * bowlShape;
                 var edgeBlend = Math.Max(0.0, 1.0 - radius);
-                var noise = (random.NextDouble() * 2.0 - 1.0) * settings.NoiseStrength * edgeBlend;
-                var z = Math.Max(-settings.BaseThickness * 0.5, rim - bowl + noise);
+                var noise = (random.NextDouble() * 2.0 - 1.0) * settings.NoiseStrength * profile.NoiseMultiplier * edgeBlend;
+                var minimumZ = settings.IncludeBase ? -settings.BaseThickness * 0.5 : 0.0;
+                var z = Math.Max(minimumZ, rim - bowl + noise);
 
                 points[x, y] = new Vertex(worldX, worldY, z);
             }
@@ -69,7 +73,7 @@ public sealed class CraterGenerator : ITerrainGenerator
     private static Vertex[,] CreateBottomSurface(HillGenerationSettings settings)
     {
         var points = new Vertex[settings.Resolution + 1, settings.Resolution + 1];
-        var bottomZ = -settings.BaseThickness;
+        var bottomZ = -settings.EffectiveBaseThickness;
 
         for (var y = 0; y <= settings.Resolution; y++)
         {

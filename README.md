@@ -24,6 +24,9 @@ The desktop app includes:
 - orbit, zoom, pan, and reset camera controls,
 - a parameter panel,
 - terrain generator selection,
+- terrain style presets,
+- with-base / without-base generation,
+- target triangle budget control,
 - STL export.
 
 ## Run the CLI

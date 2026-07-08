@@ -46,6 +46,16 @@
                         <ComboBoxItem Content="Block building" />
                     </ComboBox>
 
+                    <TextBlock Text="Style" Style="{StaticResource LabelTextBlockStyle}" />
+                    <ComboBox x:Name="StyleComboBox" SelectedIndex="0" Margin="0,4,0,12">
+                        <ComboBoxItem Content="Realistic" />
+                        <ComboBoxItem Content="Stylized" />
+                        <ComboBoxItem Content="Anime-inspired" />
+                        <ComboBoxItem Content="Miniature-friendly" />
+                        <ComboBoxItem Content="Low-poly" />
+                        <ComboBoxItem Content="Rugged / natural" />
+                    </ComboBox>
+
                     <TextBlock Text="Width (mm)" Style="{StaticResource LabelTextBlockStyle}" />
                     <TextBox x:Name="WidthTextBox" Text="120" Margin="0,4,0,10" />
 
@@ -58,6 +68,9 @@
                     <TextBlock Text="Resolution" Style="{StaticResource LabelTextBlockStyle}" />
                     <TextBox x:Name="ResolutionTextBox" Text="48" Margin="0,4,0,10" />
 
+                    <TextBlock Text="Target triangles" Style="{StaticResource LabelTextBlockStyle}" />
+                    <TextBox x:Name="TargetTriangleCountTextBox" Text="9600" Margin="0,4,0,10" />
+
                     <TextBlock Text="Noise strength" Style="{StaticResource LabelTextBlockStyle}" />
                     <TextBox x:Name="NoiseTextBox" Text="1.75" Margin="0,4,0,10" />
 
@@ -65,7 +78,9 @@
                     <TextBox x:Name="SeedTextBox" Text="20260707" Margin="0,4,0,10" />
 
                     <TextBlock Text="Base thickness (mm)" Style="{StaticResource LabelTextBlockStyle}" />
-                    <TextBox x:Name="BaseThicknessTextBox" Text="5" Margin="0,4,0,18" />
+                    <TextBox x:Name="BaseThicknessTextBox" Text="5" Margin="0,4,0,10" />
+
+                    <CheckBox x:Name="IncludeBaseCheckBox" Content="Generate with printable base" IsChecked="True" Foreground="#F3F5F7" Margin="0,2,0,18" />
 
                     <Button Content="Generate" Height="34" Click="GenerateButton_Click" />
                     <Button Content="Export STL" Height="34" Margin="0,8,0,0" Click="ExportButton_Click" />
@@ -98,8 +113,17 @@
                 <TextBlock Text="Generator" Style="{StaticResource LabelTextBlockStyle}" />
                 <TextBlock x:Name="GeneratorValueTextBlock" Text="Hill" Style="{StaticResource ValueTextBlockStyle}" />
 
+                <TextBlock Text="Style" Style="{StaticResource LabelTextBlockStyle}" />
+                <TextBlock x:Name="StyleValueTextBlock" Text="Realistic" Style="{StaticResource ValueTextBlockStyle}" />
+
+                <TextBlock Text="Base" Style="{StaticResource LabelTextBlockStyle}" />
+                <TextBlock x:Name="BaseValueTextBlock" Text="With base" Style="{StaticResource ValueTextBlockStyle}" />
+
                 <TextBlock Text="Triangle count" Style="{StaticResource LabelTextBlockStyle}" />
                 <TextBlock x:Name="TriangleCountTextBlock" Text="0" Style="{StaticResource ValueTextBlockStyle}" />
+
+                <TextBlock Text="Target triangles" Style="{StaticResource LabelTextBlockStyle}" />
+                <TextBlock x:Name="TargetTriangleCountValueTextBlock" Text="-" Style="{StaticResource ValueTextBlockStyle}" />
 
                 <TextBlock Text="Bounds" Style="{StaticResource LabelTextBlockStyle}" />
                 <TextBlock x:Name="BoundsTextBlock" Text="-" Style="{StaticResource ValueTextBlockStyle}" TextWrapping="Wrap" />

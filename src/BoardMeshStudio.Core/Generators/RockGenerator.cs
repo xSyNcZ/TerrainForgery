@@ -6,9 +6,11 @@ public sealed class RockGenerator : ITerrainGenerator
 {
     public Mesh Generate(HillGenerationSettings settings)
     {
+        settings = TriangleBudgetResolver.Apply(settings);
         Validate(settings);
 
         var random = new Random(settings.Seed);
+        var profile = TerrainStyleProfile.From(settings.Style);
         var mesh = new Mesh();
         var top = new Vertex[settings.Resolution + 1, settings.Resolution + 1];
         var bottom = new Vertex[settings.Resolution + 1, settings.Resolution + 1];
@@ -22,12 +24,12 @@ public sealed class RockGenerator : ITerrainGenerator
                 var normalizedX = worldX / (settings.Width / 2.0);
                 var normalizedY = worldY / (settings.Depth / 2.0);
                 var radiusSquared = normalizedX * normalizedX + normalizedY * normalizedY;
-                var cap = Math.Sqrt(Math.Max(0.0, 1.0 - radiusSquared));
-                var noise = (random.NextDouble() * 2.0 - 1.0) * settings.NoiseStrength * cap;
-                var z = Math.Max(0.0, settings.Height * cap + noise);
+                var cap = Math.Pow(Math.Sqrt(Math.Max(0.0, 1.0 - radiusSquared)), profile.ShapeExponent);
+                var noise = (random.NextDouble() * 2.0 - 1.0) * settings.NoiseStrength * profile.NoiseMultiplier * cap;
+                var z = Math.Max(0.0, settings.Height * profile.HeightMultiplier * cap + noise);
 
                 top[x, y] = new Vertex(worldX, worldY, z);
-                bottom[x, y] = new Vertex(worldX, worldY, -settings.BaseThickness);
+                bottom[x, y] = new Vertex(worldX, worldY, -settings.EffectiveBaseThickness);
             }
         }
 

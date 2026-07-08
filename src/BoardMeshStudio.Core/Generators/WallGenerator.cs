@@ -8,8 +8,9 @@ public sealed class WallGenerator : ITerrainGenerator
     {
         Validate(settings);
 
+        var profile = TerrainStyleProfile.From(settings.Style);
         var wallDepth = Math.Max(2.0, settings.Depth * 0.18);
-        return BoxMeshBuilder.CreateBox(settings.Width, wallDepth, settings.Height, -settings.BaseThickness);
+        return BoxMeshBuilder.CreateBox(settings.Width, wallDepth, settings.Height * profile.HeightMultiplier, -settings.EffectiveBaseThickness);
     }
 
     private static void Validate(HillGenerationSettings settings)
