@@ -99,6 +99,8 @@ These patch milestones refine the first desktop preview before the larger scale 
 | v0.1.2 | Triangle budget controls | Completed |
 | v0.1.3 | Terrain precision and quality pass | Completed |
 | v0.1.4 | Visual style presets | Planned |
+| v0.1.5 | No-base edge smoothing | Planned |
+| v0.1.6 | Bounds fitting improvements | Planned |
 
 ##### v0.1.1 - Base Toggle
 
@@ -164,6 +166,32 @@ These patch milestones refine the first desktop preview before the larger scale 
 - [ ] Let style presets meaningfully affect shape language, exaggeration, smoothness, and detail density.
 - [ ] Make style differences visible enough to matter in generated terrain.
 - [ ] Keep styles generic and avoid references to specific copyrighted franchises or game systems.
+
+**Status:** Planned
+
+##### v0.1.5 - No-Base Edge Smoothing
+
+**Goal:** smooth and clean up visible terrain edges when generating objects without a printable base.
+
+**Scope:**
+
+- [ ] Smooth jagged open edges created by no-base terrain trimming.
+- [ ] Reduce abrupt height drops near the object footprint.
+- [ ] Keep the no-base output visually natural while preserving STL export compatibility.
+- [ ] Add tests or mesh checks for no-base edge behavior where practical.
+
+**Status:** Planned
+
+##### v0.1.6 - Bounds Fitting Improvements
+
+**Goal:** keep generated objects reliably inside the requested width, depth, and height bounds.
+
+**Scope:**
+
+- [ ] Audit generators that can extend geometry beyond requested bounds.
+- [ ] Clamp or rescale generated vertices so the final mesh fits expected dimensions.
+- [ ] Keep architectural details, terrain noise, and asymmetry from pushing objects outside limits.
+- [ ] Add bounds-focused tests for terrain and object generators.
 
 **Status:** Planned
 
