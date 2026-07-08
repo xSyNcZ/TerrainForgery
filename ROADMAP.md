@@ -97,7 +97,7 @@ These patch milestones refine the first desktop preview before the larger scale 
 | --- | --- | --- |
 | v0.1.1 | Base toggle | Completed |
 | v0.1.2 | Triangle budget controls | Completed |
-| v0.1.3 | Terrain precision and quality pass | Planned |
+| v0.1.3 | Terrain precision and quality pass | Completed |
 | v0.1.4 | Visual style presets | Planned |
 
 ##### v0.1.1 - Base Toggle
@@ -132,14 +132,18 @@ These patch milestones refine the first desktop preview before the larger scale 
 
 **Scope:**
 
-- [ ] Improve height falloff and surface shaping.
-- [ ] Reduce unwanted artifacts and overly flat areas.
-- [ ] Improve normals, mesh consistency, and STL export quality where needed.
-- [ ] Add generator-specific quality checks where useful.
-- [ ] Preserve deterministic seed-based generation.
-- [ ] Review generated STL files visually and iterate on terrain quality.
+- [x] Improve height falloff and surface shaping.
+- [x] Reduce unwanted artifacts and overly flat areas.
+- [x] Improve normals, mesh consistency, and STL export quality where needed.
+- [x] Add generator-specific quality checks where useful.
+- [x] Preserve deterministic seed-based generation.
+- [x] Add seed-digit controls for roughness, rockiness, asymmetry, and detail scale.
+- [x] Add random seed generation in the desktop preview.
+- [x] Trim flat outer terrain cells when generating hill, crater, and rock objects without a base.
+- [x] Add a millimeter scale grid to the 3D preview.
+- [x] Improve the building placeholder with roof, doors, windows, and chimney geometry.
 
-**Status:** Planned
+**Status:** Completed
 
 ##### v0.1.4 - Visual Style Presets
 
@@ -152,11 +156,11 @@ These patch milestones refine the first desktop preview before the larger scale 
 - [ ] Anime-inspired
 - [ ] Miniature-friendly
 - [ ] Low-poly
-- [ ] Rugged / natural
+- [x] Rugged / natural as the only active current profile
 
 **Scope:**
 
-- [ ] Add a style selection control.
+- [ ] Reintroduce a style selection control only when presets create visibly different geometry.
 - [ ] Let style presets meaningfully affect shape language, exaggeration, smoothness, and detail density.
 - [ ] Make style differences visible enough to matter in generated terrain.
 - [ ] Keep styles generic and avoid references to specific copyrighted franchises or game systems.

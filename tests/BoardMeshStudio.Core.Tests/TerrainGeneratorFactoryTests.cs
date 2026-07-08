@@ -47,7 +47,29 @@ public sealed class TerrainGeneratorFactoryTests
         var mesh = TerrainGeneratorFactory.Create(TerrainGeneratorType.Hill).Generate(settings);
 
         var bounds = MeshBoundsCalculator.Calculate(mesh);
-        Assert.Equal(0.0, bounds.MinZ);
+        Assert.True(bounds.MinZ >= 0.0);
+    }
+
+    [Theory]
+    [InlineData(TerrainGeneratorType.Hill)]
+    [InlineData(TerrainGeneratorType.Crater)]
+    [InlineData(TerrainGeneratorType.Rock)]
+    public void Generate_WithoutBase_TrimsFlatOuterPlate(TerrainGeneratorType type)
+    {
+        var settings = new HillGenerationSettings
+        {
+            Width = 40.0,
+            Depth = 40.0,
+            Height = 10.0,
+            Resolution = 6,
+            BaseThickness = 4.0,
+            IncludeBase = false
+        };
+
+        var mesh = TerrainGeneratorFactory.Create(type).Generate(settings);
+
+        Assert.True(mesh.HasTriangles);
+        Assert.True(mesh.Triangles.Count < 72);
     }
 
     [Fact]
@@ -88,32 +110,54 @@ public sealed class TerrainGeneratorFactoryTests
     }
 
     [Fact]
-    public void Generate_StyleChangesTerrainShape()
+    public void Generate_SeedProfileChangesTerrainShape()
     {
-        var realisticSettings = new HillGenerationSettings
+        var smoothSettings = new HillGenerationSettings
         {
             Width = 40.0,
             Depth = 40.0,
             Height = 10.0,
             Resolution = 8,
-            NoiseStrength = 0.0,
+            NoiseStrength = 1.5,
+            Seed = 1000
+        };
+        var ruggedSettings = new HillGenerationSettings
+        {
+            Width = 40.0,
+            Depth = 40.0,
+            Height = 10.0,
+            Resolution = 8,
+            NoiseStrength = 1.5,
+            Seed = 9999
+        };
+
+        var smooth = TerrainGeneratorFactory.Create(TerrainGeneratorType.Hill).Generate(smoothSettings);
+        var rugged = TerrainGeneratorFactory.Create(TerrainGeneratorType.Hill).Generate(ruggedSettings);
+
+        var smoothBounds = MeshBoundsCalculator.Calculate(smooth);
+        var ruggedBounds = MeshBoundsCalculator.Calculate(rugged);
+        Assert.NotEqual(smoothBounds.MaxZ, ruggedBounds.MaxZ);
+    }
+
+    [Fact]
+    public void Generate_BlockBuildingIncludesArchitecturalDetails()
+    {
+        var settings = new HillGenerationSettings
+        {
+            Width = 50.0,
+            Depth = 35.0,
+            Height = 24.0,
+            Resolution = 4,
+            BaseThickness = 0.0,
+            IncludeBase = false,
             Style = TerrainStyle.Realistic
         };
-        var stylizedSettings = new HillGenerationSettings
-        {
-            Width = 40.0,
-            Depth = 40.0,
-            Height = 10.0,
-            Resolution = 8,
-            NoiseStrength = 0.0,
-            Style = TerrainStyle.AnimeInspired
-        };
 
-        var realistic = TerrainGeneratorFactory.Create(TerrainGeneratorType.Hill).Generate(realisticSettings);
-        var stylized = TerrainGeneratorFactory.Create(TerrainGeneratorType.Hill).Generate(stylizedSettings);
+        var mesh = TerrainGeneratorFactory.Create(TerrainGeneratorType.BlockBuilding).Generate(settings);
+        var bounds = MeshBoundsCalculator.Calculate(mesh);
 
-        var realisticBounds = MeshBoundsCalculator.Calculate(realistic);
-        var stylizedBounds = MeshBoundsCalculator.Calculate(stylized);
-        Assert.True(stylizedBounds.MaxZ > realisticBounds.MaxZ);
+        Assert.True(mesh.Triangles.Count > 12);
+        Assert.True(bounds.MaxZ > settings.Height);
+        Assert.True(bounds.Depth > settings.Depth);
     }
 }

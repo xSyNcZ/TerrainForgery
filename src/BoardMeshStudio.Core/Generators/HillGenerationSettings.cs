@@ -20,7 +20,7 @@ public sealed class HillGenerationSettings
 
     public int? TargetTriangleCount { get; set; }
 
-    public TerrainStyle Style { get; set; } = TerrainStyle.Realistic;
+    public TerrainStyle Style { get; set; } = TerrainStyle.RuggedNatural;
 
     public double EffectiveBaseThickness => IncludeBase ? BaseThickness : 0.0;
 }

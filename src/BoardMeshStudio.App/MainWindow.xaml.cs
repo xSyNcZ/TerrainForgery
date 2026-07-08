@@ -77,6 +77,12 @@ public partial class MainWindow : Window
         ResetCamera();
     }
 
+    private void RandomizeSeedButton_Click(object sender, RoutedEventArgs e)
+    {
+        SeedTextBox.Text = Random.Shared.Next(0, int.MaxValue).ToString(CultureInfo.InvariantCulture);
+        GeneratePreview();
+    }
+
     private void GeneratePreview()
     {
         try
@@ -113,7 +119,7 @@ public partial class MainWindow : Window
             Seed = ReadInt(SeedTextBox, "Seed"),
             BaseThickness = ReadDouble(BaseThicknessTextBox, "Base thickness"),
             IncludeBase = IncludeBaseCheckBox.IsChecked == true,
-            Style = GetSelectedStyle()
+            Style = TerrainStyle.RuggedNatural
         };
     }
 
@@ -170,25 +176,15 @@ public partial class MainWindow : Window
         };
     }
 
-    private TerrainStyle GetSelectedStyle()
-    {
-        return StyleComboBox.SelectedIndex switch
-        {
-            0 => TerrainStyle.Realistic,
-            1 => TerrainStyle.Stylized,
-            2 => TerrainStyle.AnimeInspired,
-            3 => TerrainStyle.MiniatureFriendly,
-            4 => TerrainStyle.LowPoly,
-            5 => TerrainStyle.RuggedNatural,
-            _ => TerrainStyle.Realistic
-        };
-    }
-
     private void RenderMesh(CoreMesh mesh)
     {
         _scene.Children.Clear();
         _scene.Children.Add(new AmbientLight(Color.FromRgb(80, 86, 96)));
         _scene.Children.Add(new DirectionalLight(Colors.White, new Vector3D(-0.45, -0.35, -0.8)));
+        if (_currentBounds is not null)
+        {
+            AddScaleGrid(_currentBounds);
+        }
 
         var geometry = new MeshGeometry3D();
         var index = 0;
@@ -211,9 +207,102 @@ public partial class MainWindow : Window
             geometry.Normals.Add(normal);
         }
 
-        var material = new DiffuseMaterial(new SolidColorBrush(Color.FromRgb(104, 153, 121)));
+        var material = new DiffuseMaterial(new SolidColorBrush(Color.FromRgb(126, 116, 96)));
         var backMaterial = new DiffuseMaterial(new SolidColorBrush(Color.FromRgb(72, 91, 84)));
         _scene.Children.Add(new GeometryModel3D(geometry, material) { BackMaterial = backMaterial });
+    }
+
+    private void AddScaleGrid(MeshBounds bounds)
+    {
+        var interval = ChooseGridInterval(bounds.LargestDimension);
+        var minX = Math.Floor(bounds.MinX / interval) * interval;
+        var maxX = Math.Ceiling(bounds.MaxX / interval) * interval;
+        var minY = Math.Floor(bounds.MinY / interval) * interval;
+        var maxY = Math.Ceiling(bounds.MaxY / interval) * interval;
+        var z = Math.Min(0.0, bounds.MinZ) - 0.12;
+        var thickness = Math.Max(0.25, interval * 0.025);
+        var gridMaterial = new DiffuseMaterial(new SolidColorBrush(Color.FromRgb(65, 73, 83)));
+        var axisMaterial = new DiffuseMaterial(new SolidColorBrush(Color.FromRgb(116, 135, 154)));
+
+        for (var x = minX; x <= maxX + 0.001; x += interval)
+        {
+            var material = Math.Abs(x) < 0.001 ? axisMaterial : gridMaterial;
+            _scene.Children.Add(CreateBoxModel(x, (minY + maxY) / 2.0, z, thickness, maxY - minY, thickness, material));
+        }
+
+        for (var y = minY; y <= maxY + 0.001; y += interval)
+        {
+            var material = Math.Abs(y) < 0.001 ? axisMaterial : gridMaterial;
+            _scene.Children.Add(CreateBoxModel((minX + maxX) / 2.0, y, z, maxX - minX, thickness, thickness, material));
+        }
+    }
+
+    private static double ChooseGridInterval(double largestDimension)
+    {
+        if (largestDimension <= 80.0)
+        {
+            return 10.0;
+        }
+
+        if (largestDimension <= 220.0)
+        {
+            return 25.0;
+        }
+
+        return 50.0;
+    }
+
+    private static GeometryModel3D CreateBoxModel(
+        double centerX,
+        double centerY,
+        double centerZ,
+        double width,
+        double depth,
+        double height,
+        Material material)
+    {
+        var geometry = new MeshGeometry3D();
+        var hx = width / 2.0;
+        var hy = depth / 2.0;
+        var hz = height / 2.0;
+
+        var p000 = new Point3D(centerX - hx, centerY - hy, centerZ - hz);
+        var p100 = new Point3D(centerX + hx, centerY - hy, centerZ - hz);
+        var p110 = new Point3D(centerX + hx, centerY + hy, centerZ - hz);
+        var p010 = new Point3D(centerX - hx, centerY + hy, centerZ - hz);
+        var p001 = new Point3D(centerX - hx, centerY - hy, centerZ + hz);
+        var p101 = new Point3D(centerX + hx, centerY - hy, centerZ + hz);
+        var p111 = new Point3D(centerX + hx, centerY + hy, centerZ + hz);
+        var p011 = new Point3D(centerX - hx, centerY + hy, centerZ + hz);
+
+        AddQuad(geometry, p001, p101, p111, p011);
+        AddQuad(geometry, p000, p010, p110, p100);
+        AddQuad(geometry, p000, p100, p101, p001);
+        AddQuad(geometry, p100, p110, p111, p101);
+        AddQuad(geometry, p110, p010, p011, p111);
+        AddQuad(geometry, p010, p000, p001, p011);
+
+        return new GeometryModel3D(geometry, material);
+    }
+
+    private static void AddQuad(MeshGeometry3D geometry, Point3D a, Point3D b, Point3D c, Point3D d)
+    {
+        var start = geometry.Positions.Count;
+        var normal = CalculateNormal(a, b, c);
+        geometry.Positions.Add(a);
+        geometry.Positions.Add(b);
+        geometry.Positions.Add(c);
+        geometry.Positions.Add(d);
+        geometry.TriangleIndices.Add(start);
+        geometry.TriangleIndices.Add(start + 1);
+        geometry.TriangleIndices.Add(start + 2);
+        geometry.TriangleIndices.Add(start);
+        geometry.TriangleIndices.Add(start + 2);
+        geometry.TriangleIndices.Add(start + 3);
+        geometry.Normals.Add(normal);
+        geometry.Normals.Add(normal);
+        geometry.Normals.Add(normal);
+        geometry.Normals.Add(normal);
     }
 
     private static Point3D ToPoint3D(BoardMeshStudio.Core.Geometry.Vertex vertex)
@@ -235,7 +324,6 @@ public partial class MainWindow : Window
     private void UpdateStats(TerrainGeneratorType generatorType, HillGenerationSettings settings, CoreMesh mesh, MeshBounds bounds)
     {
         GeneratorValueTextBlock.Text = generatorType.ToString();
-        StyleValueTextBlock.Text = settings.Style.ToString();
         BaseValueTextBlock.Text = settings.IncludeBase ? "With base" : "Without base";
         TriangleCountTextBlock.Text = mesh.Triangles.Count.ToString(CultureInfo.InvariantCulture);
         TargetTriangleCountValueTextBlock.Text = settings.TargetTriangleCount?.ToString(CultureInfo.InvariantCulture) ?? "-";

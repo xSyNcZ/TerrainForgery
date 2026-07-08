@@ -22,12 +22,28 @@ The desktop app includes:
 
 - a 3D preview for a generated terrain mesh,
 - orbit, zoom, pan, and reset camera controls,
+- a millimeter scale grid in the preview,
 - a parameter panel,
 - terrain generator selection,
-- terrain style presets,
+- rugged / natural terrain profile,
 - with-base / without-base generation,
 - target triangle budget control,
+- seed randomization,
 - STL export.
+
+## Generation Parameters
+
+`Resolution` is the terrain grid subdivision count. Higher values create more vertices, more triangles, and finer detail. If `Target triangles` is set, the app estimates a matching resolution automatically.
+
+Seed digits currently influence terrain character:
+
+- ones digit: roughness, from smoother to bumpier,
+- tens digit: rockiness and ridge strength,
+- hundreds digit: asymmetry and off-center shaping,
+- thousands digit: detail scale, from broader forms to tighter features,
+- remaining digits: deterministic noise phase and variation.
+
+Style presets are intentionally hidden in the current app. The active terrain profile is `Rugged / natural`; broader style presets are planned for a later v0.1.x pass once they produce clearly distinct geometry.
 
 ## Run the CLI
 
