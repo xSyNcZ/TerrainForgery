@@ -25,8 +25,11 @@ The desktop app includes:
 - a millimeter scale grid in the preview,
 - a parameter panel,
 - terrain generator selection,
-- rugged / natural terrain profile,
+- terrain style presets,
 - with-base / without-base generation,
+- smoothed no-base terrain edges,
+- bounds fitting for generated objects,
+- configurable outer wall thickness,
 - target triangle budget control,
 - seed randomization,
 - STL export.
@@ -43,7 +46,7 @@ Seed digits currently influence terrain character:
 - thousands digit: detail scale, from broader forms to tighter features,
 - remaining digits: deterministic noise phase and variation.
 
-Style presets are intentionally hidden in the current app. The active terrain profile is `Rugged / natural`; broader style presets are planned for a later v0.1.x pass once they produce clearly distinct geometry.
+Style presets influence shape, smoothness, detail density, and preview color. Current presets are `Realistic`, `Stylized`, `Anime-inspired`, `Miniature-friendly`, `Low-poly`, and `Rugged / natural`.
 
 ## Run the CLI
 

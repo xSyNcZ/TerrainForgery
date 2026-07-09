@@ -94,7 +94,7 @@ public partial class MainWindow : Window
 
             _currentMesh = mesh;
             _currentBounds = MeshBoundsCalculator.Calculate(mesh);
-            RenderMesh(mesh);
+            RenderMesh(mesh, settings.Style);
             ResetCamera();
             UpdateStats(generatorType, settings, mesh, _currentBounds);
             SetStatus($"Generated {generatorType} mesh with {mesh.Triangles.Count} triangles.");
@@ -118,8 +118,9 @@ public partial class MainWindow : Window
             NoiseStrength = ReadDouble(NoiseTextBox, "Noise strength"),
             Seed = ReadInt(SeedTextBox, "Seed"),
             BaseThickness = ReadDouble(BaseThicknessTextBox, "Base thickness"),
+            OuterWallThickness = ReadDouble(OuterWallThicknessTextBox, "Outer wall thickness"),
             IncludeBase = IncludeBaseCheckBox.IsChecked == true,
-            Style = TerrainStyle.RuggedNatural
+            Style = GetSelectedStyle()
         };
     }
 
@@ -176,7 +177,21 @@ public partial class MainWindow : Window
         };
     }
 
-    private void RenderMesh(CoreMesh mesh)
+    private TerrainStyle GetSelectedStyle()
+    {
+        return StyleComboBox.SelectedIndex switch
+        {
+            0 => TerrainStyle.Realistic,
+            1 => TerrainStyle.Stylized,
+            2 => TerrainStyle.AnimeInspired,
+            3 => TerrainStyle.MiniatureFriendly,
+            4 => TerrainStyle.LowPoly,
+            5 => TerrainStyle.RuggedNatural,
+            _ => TerrainStyle.RuggedNatural
+        };
+    }
+
+    private void RenderMesh(CoreMesh mesh, TerrainStyle style)
     {
         _scene.Children.Clear();
         _scene.Children.Add(new AmbientLight(Color.FromRgb(80, 86, 96)));
@@ -207,9 +222,23 @@ public partial class MainWindow : Window
             geometry.Normals.Add(normal);
         }
 
-        var material = new DiffuseMaterial(new SolidColorBrush(Color.FromRgb(126, 116, 96)));
+        var material = new DiffuseMaterial(new SolidColorBrush(GetStyleColor(style)));
         var backMaterial = new DiffuseMaterial(new SolidColorBrush(Color.FromRgb(72, 91, 84)));
         _scene.Children.Add(new GeometryModel3D(geometry, material) { BackMaterial = backMaterial });
+    }
+
+    private static Color GetStyleColor(TerrainStyle style)
+    {
+        return style switch
+        {
+            TerrainStyle.Realistic => Color.FromRgb(104, 153, 121),
+            TerrainStyle.Stylized => Color.FromRgb(122, 163, 193),
+            TerrainStyle.AnimeInspired => Color.FromRgb(168, 139, 207),
+            TerrainStyle.MiniatureFriendly => Color.FromRgb(128, 167, 116),
+            TerrainStyle.LowPoly => Color.FromRgb(181, 151, 93),
+            TerrainStyle.RuggedNatural => Color.FromRgb(126, 116, 96),
+            _ => Color.FromRgb(126, 116, 96)
+        };
     }
 
     private void AddScaleGrid(MeshBounds bounds)
@@ -324,6 +353,7 @@ public partial class MainWindow : Window
     private void UpdateStats(TerrainGeneratorType generatorType, HillGenerationSettings settings, CoreMesh mesh, MeshBounds bounds)
     {
         GeneratorValueTextBlock.Text = generatorType.ToString();
+        StyleValueTextBlock.Text = GetStyleLabel(settings.Style);
         BaseValueTextBlock.Text = settings.IncludeBase ? "With base" : "Without base";
         TriangleCountTextBlock.Text = mesh.Triangles.Count.ToString(CultureInfo.InvariantCulture);
         TargetTriangleCountValueTextBlock.Text = settings.TargetTriangleCount?.ToString(CultureInfo.InvariantCulture) ?? "-";
@@ -333,6 +363,20 @@ public partial class MainWindow : Window
             bounds.Width,
             bounds.Depth,
             bounds.Height);
+    }
+
+    private static string GetStyleLabel(TerrainStyle style)
+    {
+        return style switch
+        {
+            TerrainStyle.Realistic => "Realistic",
+            TerrainStyle.Stylized => "Stylized",
+            TerrainStyle.AnimeInspired => "Anime-inspired",
+            TerrainStyle.MiniatureFriendly => "Miniature-friendly",
+            TerrainStyle.LowPoly => "Low-poly",
+            TerrainStyle.RuggedNatural => "Rugged / natural",
+            _ => style.ToString()
+        };
     }
 
     private void ResetCamera()

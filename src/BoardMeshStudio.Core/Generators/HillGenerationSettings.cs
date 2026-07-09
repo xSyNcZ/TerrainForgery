@@ -16,6 +16,8 @@ public sealed class HillGenerationSettings
 
     public double BaseThickness { get; set; } = 4.0;
 
+    public double OuterWallThickness { get; set; } = 2.0;
+
     public bool IncludeBase { get; set; } = true;
 
     public int? TargetTriangleCount { get; set; }

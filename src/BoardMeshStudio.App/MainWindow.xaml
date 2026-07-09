@@ -46,6 +46,16 @@
                         <ComboBoxItem Content="Block building" />
                     </ComboBox>
 
+                    <TextBlock Text="Style" Style="{StaticResource LabelTextBlockStyle}" />
+                    <ComboBox x:Name="StyleComboBox" SelectedIndex="5" Margin="0,4,0,12">
+                        <ComboBoxItem Content="Realistic" />
+                        <ComboBoxItem Content="Stylized" />
+                        <ComboBoxItem Content="Anime-inspired" />
+                        <ComboBoxItem Content="Miniature-friendly" />
+                        <ComboBoxItem Content="Low-poly" />
+                        <ComboBoxItem Content="Rugged / natural" />
+                    </ComboBox>
+
                     <TextBlock Text="Width (mm)" Style="{StaticResource LabelTextBlockStyle}" />
                     <TextBox x:Name="WidthTextBox" Text="120" Margin="0,4,0,10" />
 
@@ -79,6 +89,9 @@
                     <TextBlock Text="Base thickness (mm)" Style="{StaticResource LabelTextBlockStyle}" />
                     <TextBox x:Name="BaseThicknessTextBox" Text="5" Margin="0,4,0,10" />
 
+                    <TextBlock Text="Outer wall thickness (mm)" Style="{StaticResource LabelTextBlockStyle}" />
+                    <TextBox x:Name="OuterWallThicknessTextBox" Text="3" Margin="0,4,0,10" />
+
                     <CheckBox x:Name="IncludeBaseCheckBox" Content="Generate with printable base" IsChecked="True" Foreground="#F3F5F7" Margin="0,2,0,18" />
 
                     <Button Content="Generate" Height="34" Click="GenerateButton_Click" />
@@ -111,6 +124,9 @@
 
                 <TextBlock Text="Generator" Style="{StaticResource LabelTextBlockStyle}" />
                 <TextBlock x:Name="GeneratorValueTextBlock" Text="Hill" Style="{StaticResource ValueTextBlockStyle}" />
+
+                <TextBlock Text="Style" Style="{StaticResource LabelTextBlockStyle}" />
+                <TextBlock x:Name="StyleValueTextBlock" Text="Rugged / natural" Style="{StaticResource ValueTextBlockStyle}" />
 
                 <TextBlock Text="Base" Style="{StaticResource LabelTextBlockStyle}" />
                 <TextBlock x:Name="BaseValueTextBlock" Text="With base" Style="{StaticResource ValueTextBlockStyle}" />

@@ -22,7 +22,7 @@ The long-term goal is not to become a full 3D modeling suite. BoardMesh Studio s
 | Version | Milestone | Focus | Status |
 | --- | --- | --- | --- |
 | v0.0.1 | MVP-0 | Core STL generation | Completed |
-| v0.1 | Desktop Preview App | Single-object preview and export | Current |
+| v0.1 | Desktop Preview App | Single-object preview and export | Completed |
 | v0.2 | Scale System | Scale-aware generation | Planned |
 | v0.3 | Board Size System | Inch-based board planning | Planned |
 | v0.4 | Terrain Object Library | Terrain metadata and categories | Planned |
@@ -87,20 +87,24 @@ The long-term goal is not to become a full 3D modeling suite. BoardMesh Studio s
 
 **Expected result:** running the desktop app opens a native WPF preview window where a generated terrain object can be viewed, regenerated, navigated with the camera, and exported as STL.
 
-**Status:** Current
+**Status:** Completed
+
+**Completion note:** v0.1 is closed. The desktop preview can generate, preview, parameterize, and export single terrain objects with style presets, seed controls, optional bases, edge smoothing, bounds fitting, and configurable outer wall thickness.
 
 #### v0.1.x - Desktop Preview Refinement Backlog
 
 These patch milestones refine the first desktop preview before the larger scale and board systems start in v0.2.
+
+**Segment status:** Completed. All v0.1.x refinement patches are closed.
 
 | Version | Focus | Status |
 | --- | --- | --- |
 | v0.1.1 | Base toggle | Completed |
 | v0.1.2 | Triangle budget controls | Completed |
 | v0.1.3 | Terrain precision and quality pass | Completed |
-| v0.1.4 | Visual style presets | Planned |
-| v0.1.5 | No-base edge smoothing | Planned |
-| v0.1.6 | Bounds fitting improvements | Planned |
+| v0.1.4 | Visual style presets | Completed |
+| v0.1.5 | No-base edge smoothing | Completed |
+| v0.1.6 | Bounds fitting improvements | Completed |
 
 ##### v0.1.1 - Base Toggle
 
@@ -153,21 +157,21 @@ These patch milestones refine the first desktop preview before the larger scale 
 
 **Initial style ideas:**
 
-- [ ] Realistic
-- [ ] Stylized
-- [ ] Anime-inspired
-- [ ] Miniature-friendly
-- [ ] Low-poly
-- [x] Rugged / natural as the only active current profile
+- [x] Realistic
+- [x] Stylized
+- [x] Anime-inspired
+- [x] Miniature-friendly
+- [x] Low-poly
+- [x] Rugged / natural
 
 **Scope:**
 
-- [ ] Reintroduce a style selection control only when presets create visibly different geometry.
-- [ ] Let style presets meaningfully affect shape language, exaggeration, smoothness, and detail density.
-- [ ] Make style differences visible enough to matter in generated terrain.
-- [ ] Keep styles generic and avoid references to specific copyrighted franchises or game systems.
+- [x] Reintroduce a style selection control only when presets create visibly different geometry.
+- [x] Let style presets meaningfully affect shape language, exaggeration, smoothness, and detail density.
+- [x] Make style differences visible enough to matter in generated terrain.
+- [x] Keep styles generic and avoid references to specific copyrighted franchises or game systems.
 
-**Status:** Planned
+**Status:** Completed
 
 ##### v0.1.5 - No-Base Edge Smoothing
 
@@ -175,12 +179,13 @@ These patch milestones refine the first desktop preview before the larger scale 
 
 **Scope:**
 
-- [ ] Smooth jagged open edges created by no-base terrain trimming.
-- [ ] Reduce abrupt height drops near the object footprint.
-- [ ] Keep the no-base output visually natural while preserving STL export compatibility.
-- [ ] Add tests or mesh checks for no-base edge behavior where practical.
+- [x] Smooth jagged open edges created by no-base terrain trimming.
+- [x] Reduce abrupt height drops near the object footprint.
+- [x] Keep the no-base output visually natural while preserving STL export compatibility.
+- [x] Close no-base terrain objects down to a flat Z=0 underside instead of leaving open floating edges.
+- [x] Add tests or mesh checks for no-base edge behavior where practical.
 
-**Status:** Planned
+**Status:** Completed
 
 ##### v0.1.6 - Bounds Fitting Improvements
 
@@ -188,12 +193,13 @@ These patch milestones refine the first desktop preview before the larger scale 
 
 **Scope:**
 
-- [ ] Audit generators that can extend geometry beyond requested bounds.
-- [ ] Clamp or rescale generated vertices so the final mesh fits expected dimensions.
-- [ ] Keep architectural details, terrain noise, and asymmetry from pushing objects outside limits.
-- [ ] Add bounds-focused tests for terrain and object generators.
+- [x] Audit generators that can extend geometry beyond requested bounds.
+- [x] Clamp or rescale generated vertices so the final mesh fits expected dimensions.
+- [x] Keep architectural details, terrain noise, and asymmetry from pushing objects outside limits.
+- [x] Add configurable outer wall thickness for base lips and terrain footprint spacing.
+- [x] Add bounds-focused tests for terrain and object generators.
 
-**Status:** Planned
+**Status:** Completed
 
 ### v0.2 - Scale System
 

@@ -27,6 +27,7 @@ public sealed class TriangleBudgetResolverTests
             NoiseStrength = 0.7,
             Seed = 99,
             BaseThickness = 3.0,
+            OuterWallThickness = 4.0,
             IncludeBase = false,
             TargetTriangleCount = 252,
             Style = TerrainStyle.RuggedNatural
@@ -41,6 +42,7 @@ public sealed class TriangleBudgetResolverTests
         Assert.Equal(settings.NoiseStrength, resolved.NoiseStrength);
         Assert.Equal(settings.Seed, resolved.Seed);
         Assert.Equal(settings.BaseThickness, resolved.BaseThickness);
+        Assert.Equal(settings.OuterWallThickness, resolved.OuterWallThickness);
         Assert.Equal(settings.IncludeBase, resolved.IncludeBase);
         Assert.Equal(settings.TargetTriangleCount, resolved.TargetTriangleCount);
         Assert.Equal(settings.Style, resolved.Style);

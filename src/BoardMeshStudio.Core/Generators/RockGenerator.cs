@@ -14,17 +14,19 @@ public sealed class RockGenerator : ITerrainGenerator
         var seedProfile = SeedProfile.FromSeed(settings.Seed);
         var mesh = new Mesh();
         var top = new Vertex[settings.Resolution + 1, settings.Resolution + 1];
-        var bottom = settings.IncludeBase ? new Vertex[settings.Resolution + 1, settings.Resolution + 1] : null;
         var trimHeight = Math.Max(0.35, settings.Height * 0.1);
+        var surfaceWidth = TerrainFootprint.GetSurfaceWidth(settings);
+        var surfaceDepth = TerrainFootprint.GetSurfaceDepth(settings);
 
         for (var y = 0; y <= settings.Resolution; y++)
         {
             for (var x = 0; x <= settings.Resolution; x++)
             {
-                var worldX = -settings.Width / 2.0 + settings.Width * x / settings.Resolution;
-                var worldY = -settings.Depth / 2.0 + settings.Depth * y / settings.Resolution;
-                var normalizedX = worldX / (settings.Width / 2.0);
-                var normalizedY = worldY / (settings.Depth / 2.0);
+                var squareX = -1.0 + 2.0 * x / settings.Resolution;
+                var squareY = -1.0 + 2.0 * y / settings.Resolution;
+                var (normalizedX, normalizedY) = TerrainGridMesher.MapSquareToDisk(squareX, squareY);
+                var worldX = normalizedX * surfaceWidth / 2.0;
+                var worldY = normalizedY * surfaceDepth / 2.0;
                 var shapedX = normalizedX + seedProfile.Asymmetry * 0.12;
                 var shapedY = normalizedY - seedProfile.Asymmetry * 0.07;
                 var radiusSquared = shapedX * shapedX + shapedY * shapedY;
@@ -39,55 +41,29 @@ public sealed class RockGenerator : ITerrainGenerator
                     * profile.NoiseMultiplier
                     * cap;
                 var z = Math.Max(0.0, profile.ShapeHeight(settings.Height * profile.HeightMultiplier * cap + noise));
+                z = ApplyEdgeFade(z, normalizedX, normalizedY);
 
-                top[x, y] = new Vertex(worldX, worldY, z);
-                if (bottom is not null)
-                {
-                    bottom[x, y] = new Vertex(worldX, worldY, -settings.EffectiveBaseThickness);
-                }
+                var vertex = new Vertex(worldX, worldY, z);
+                top[x, y] = vertex;
             }
         }
 
-        for (var y = 0; y < settings.Resolution; y++)
+        var activeCells = TerrainGridMesher.AddTopSurface(
+            mesh,
+            top,
+            settings.Resolution,
+            (_, _, _, _) => false);
+
+        if (settings.IncludeBase)
         {
-            for (var x = 0; x < settings.Resolution; x++)
-            {
-                var p00 = top[x, y];
-                var p10 = top[x + 1, y];
-                var p01 = top[x, y + 1];
-                var p11 = top[x + 1, y + 1];
-
-                if (bottom is null && (IsFlatCell(p00, p10, p01, p11, trimHeight) || IsOutsideFootprint(p00, p10, p01, p11, settings.Width, settings.Depth)))
-                {
-                    continue;
-                }
-
-                mesh.AddTriangle(p00, p10, p11);
-                mesh.AddTriangle(p00, p11, p01);
-                if (bottom is not null)
-                {
-                    mesh.AddTriangle(bottom[x, y], bottom[x + 1, y + 1], bottom[x + 1, y]);
-                    mesh.AddTriangle(bottom[x, y], bottom[x, y + 1], bottom[x + 1, y + 1]);
-                }
-            }
+            TerrainGridMesher.AddRectangularBase(mesh, settings);
         }
-
-        if (bottom is not null)
+        else
         {
-            for (var x = 0; x < settings.Resolution; x++)
-            {
-                AddQuad(mesh, top[x, 0], bottom[x, 0], bottom[x + 1, 0], top[x + 1, 0]);
-                AddQuad(mesh, top[x + 1, settings.Resolution], bottom[x + 1, settings.Resolution], bottom[x, settings.Resolution], top[x, settings.Resolution]);
-            }
-
-            for (var y = 0; y < settings.Resolution; y++)
-            {
-                AddQuad(mesh, top[0, y + 1], bottom[0, y + 1], bottom[0, y], top[0, y]);
-                AddQuad(mesh, top[settings.Resolution, y], bottom[settings.Resolution, y], bottom[settings.Resolution, y + 1], top[settings.Resolution, y + 1]);
-            }
+            TerrainGridMesher.AddZeroBottomAndBoundarySides(mesh, top, activeCells, settings.Resolution);
         }
 
-        return mesh;
+        return MeshBoundsFitter.FitToSettings(mesh, settings);
     }
 
     private static void Validate(HillGenerationSettings settings)
@@ -103,12 +79,19 @@ public sealed class RockGenerator : ITerrainGenerator
         {
             throw new ArgumentException("Width, Depth, and Height must be greater than zero.", nameof(settings));
         }
+
+        if (settings.OuterWallThickness < 0)
+        {
+            throw new ArgumentException("OuterWallThickness cannot be negative.", nameof(settings));
+        }
     }
 
-    private static void AddQuad(Mesh mesh, Vertex topA, Vertex bottomA, Vertex bottomB, Vertex topB)
+    private static double ApplyEdgeFade(double z, double normalizedX, double normalizedY)
     {
-        mesh.AddTriangle(topA, bottomA, bottomB);
-        mesh.AddTriangle(topA, bottomB, topB);
+        var radius = Math.Sqrt(normalizedX * normalizedX + normalizedY * normalizedY);
+        var fade = Math.Clamp((1.0 - radius) / 0.22, 0.0, 1.0);
+        var smoothFade = fade * fade * (3.0 - 2.0 * fade);
+        return z * smoothFade;
     }
 
     private static bool IsFlatCell(Vertex p00, Vertex p10, Vertex p01, Vertex p11, double trimHeight)
@@ -119,10 +102,4 @@ public sealed class RockGenerator : ITerrainGenerator
             && p11.Z <= trimHeight;
     }
 
-    private static bool IsOutsideFootprint(Vertex p00, Vertex p10, Vertex p01, Vertex p11, double width, double depth)
-    {
-        var centerX = (p00.X + p10.X + p01.X + p11.X) / 4.0 / (width / 2.0);
-        var centerY = (p00.Y + p10.Y + p01.Y + p11.Y) / 4.0 / (depth / 2.0);
-        return centerX * centerX + centerY * centerY > 1.0;
-    }
 }

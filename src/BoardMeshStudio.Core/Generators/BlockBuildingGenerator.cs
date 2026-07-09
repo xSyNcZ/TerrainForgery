@@ -8,18 +8,22 @@ public sealed class BlockBuildingGenerator : ITerrainGenerator
     {
         Validate(settings);
 
-        var profile = TerrainStyleProfile.From(settings.Style);
         var mesh = new Mesh();
         var floorZ = -settings.EffectiveBaseThickness;
-        var wallHeight = settings.Height * profile.HeightMultiplier;
-        var roofHeight = Math.Max(4.0, wallHeight * GetRoofRatio(settings.Style));
+        var margin = Math.Clamp(settings.OuterWallThickness, 1.0, Math.Min(settings.Width, settings.Depth) * 0.2);
+        var bodyWidth = Math.Max(settings.Width * 0.45, settings.Width - margin * 2.0);
+        var bodyDepth = Math.Max(settings.Depth * 0.45, settings.Depth - margin * 2.0);
+        var roofOverhang = Math.Min(margin * 0.45, Math.Min((settings.Width - bodyWidth) / 2.0, (settings.Depth - bodyDepth) / 2.0));
+        var roofHeight = Math.Max(2.5, settings.Height * GetRoofRatio(settings.Style));
+        var wallHeight = Math.Max(settings.Height * 0.45, settings.Height - roofHeight - 0.4);
+        var bodyHeight = wallHeight - floorZ;
 
-        BoxMeshBuilder.AddBox(mesh, 0.0, 0.0, floorZ, settings.Width, settings.Depth, wallHeight - floorZ);
-        BoxMeshBuilder.AddGableRoof(mesh, settings.Width, settings.Depth, wallHeight, roofHeight, Math.Max(1.0, settings.Width * 0.04));
-        AddFacadeDetails(mesh, settings, wallHeight);
-        AddChimney(mesh, settings, wallHeight, roofHeight);
+        BoxMeshBuilder.AddBox(mesh, 0.0, 0.0, floorZ, bodyWidth, bodyDepth, bodyHeight);
+        BoxMeshBuilder.AddGableRoof(mesh, bodyWidth, bodyDepth, wallHeight, roofHeight, roofOverhang);
+        AddFacadeDetails(mesh, settings, bodyWidth, bodyDepth, wallHeight);
+        AddChimney(mesh, settings, bodyWidth, bodyDepth, wallHeight, roofHeight);
 
-        return mesh;
+        return MeshBoundsFitter.FitToSettings(mesh, settings);
     }
 
     private static double GetRoofRatio(TerrainStyle style)
@@ -35,43 +39,44 @@ public sealed class BlockBuildingGenerator : ITerrainGenerator
         };
     }
 
-    private static void AddFacadeDetails(Mesh mesh, HillGenerationSettings settings, double wallHeight)
+    private static void AddFacadeDetails(Mesh mesh, HillGenerationSettings settings, double bodyWidth, double bodyDepth, double wallHeight)
     {
-        var frontY = -settings.Depth / 2.0 - 0.35;
-        var backY = settings.Depth / 2.0 + 0.35;
-        var doorWidth = Math.Max(5.0, settings.Width * 0.16);
+        var detailDepth = Math.Min(0.7, Math.Max(0.25, settings.Depth * 0.025));
+        var frontY = -bodyDepth / 2.0 - detailDepth / 2.0;
+        var backY = bodyDepth / 2.0 + detailDepth / 2.0;
+        var doorWidth = Math.Max(3.0, bodyWidth * 0.18);
         var doorHeight = Math.Max(9.0, wallHeight * 0.42);
-        var windowWidth = Math.Max(4.0, settings.Width * 0.13);
+        var windowWidth = Math.Max(2.8, bodyWidth * 0.14);
         var windowHeight = Math.Max(4.0, wallHeight * 0.18);
         var windowZ = Math.Max(doorHeight * 0.75, wallHeight * 0.48);
 
-        BoxMeshBuilder.AddBox(mesh, 0.0, frontY, 0.0, doorWidth, 0.7, doorHeight);
-        BoxMeshBuilder.AddBox(mesh, -settings.Width * 0.28, frontY, windowZ, windowWidth, 0.7, windowHeight);
-        BoxMeshBuilder.AddBox(mesh, settings.Width * 0.28, frontY, windowZ, windowWidth, 0.7, windowHeight);
-        BoxMeshBuilder.AddBox(mesh, -settings.Width * 0.25, backY, windowZ, windowWidth, 0.7, windowHeight);
-        BoxMeshBuilder.AddBox(mesh, settings.Width * 0.25, backY, windowZ, windowWidth, 0.7, windowHeight);
+        BoxMeshBuilder.AddBox(mesh, 0.0, frontY, 0.0, doorWidth, detailDepth, doorHeight);
+        BoxMeshBuilder.AddBox(mesh, -bodyWidth * 0.27, frontY, windowZ, windowWidth, detailDepth, windowHeight);
+        BoxMeshBuilder.AddBox(mesh, bodyWidth * 0.27, frontY, windowZ, windowWidth, detailDepth, windowHeight);
+        BoxMeshBuilder.AddBox(mesh, -bodyWidth * 0.25, backY, windowZ, windowWidth, detailDepth, windowHeight);
+        BoxMeshBuilder.AddBox(mesh, bodyWidth * 0.25, backY, windowZ, windowWidth, detailDepth, windowHeight);
 
-        var sideWindowX = settings.Width / 2.0 + 0.35;
-        AddSideWindow(mesh, sideWindowX, -settings.Depth * 0.22, windowZ, windowWidth, windowHeight);
-        AddSideWindow(mesh, sideWindowX, settings.Depth * 0.22, windowZ, windowWidth, windowHeight);
-        AddSideWindow(mesh, -sideWindowX, -settings.Depth * 0.22, windowZ, windowWidth, windowHeight);
-        AddSideWindow(mesh, -sideWindowX, settings.Depth * 0.22, windowZ, windowWidth, windowHeight);
+        var sideWindowX = bodyWidth / 2.0 + detailDepth / 2.0;
+        AddSideWindow(mesh, sideWindowX, -bodyDepth * 0.22, windowZ, windowWidth, windowHeight, detailDepth);
+        AddSideWindow(mesh, sideWindowX, bodyDepth * 0.22, windowZ, windowWidth, windowHeight, detailDepth);
+        AddSideWindow(mesh, -sideWindowX, -bodyDepth * 0.22, windowZ, windowWidth, windowHeight, detailDepth);
+        AddSideWindow(mesh, -sideWindowX, bodyDepth * 0.22, windowZ, windowWidth, windowHeight, detailDepth);
     }
 
-    private static void AddSideWindow(Mesh mesh, double x, double y, double z, double width, double height)
+    private static void AddSideWindow(Mesh mesh, double x, double y, double z, double width, double height, double detailDepth)
     {
-        BoxMeshBuilder.AddBox(mesh, x, y, z, 0.7, width, height);
+        BoxMeshBuilder.AddBox(mesh, x, y, z, detailDepth, width, height);
     }
 
-    private static void AddChimney(Mesh mesh, HillGenerationSettings settings, double wallHeight, double roofHeight)
+    private static void AddChimney(Mesh mesh, HillGenerationSettings settings, double bodyWidth, double bodyDepth, double wallHeight, double roofHeight)
     {
-        var chimneyWidth = Math.Max(3.0, settings.Width * 0.08);
-        var chimneyDepth = Math.Max(3.0, settings.Depth * 0.08);
-        var chimneyHeight = Math.Max(8.0, roofHeight * 0.75);
+        var chimneyWidth = Math.Max(2.0, bodyWidth * 0.08);
+        var chimneyDepth = Math.Max(2.0, bodyDepth * 0.08);
+        var chimneyHeight = Math.Min(Math.Max(4.0, roofHeight * 0.7), settings.Height - wallHeight - roofHeight * 0.15);
         BoxMeshBuilder.AddBox(
             mesh,
-            settings.Width * 0.28,
-            settings.Depth * 0.15,
+            bodyWidth * 0.26,
+            bodyDepth * 0.12,
             wallHeight + roofHeight * 0.25,
             chimneyWidth,
             chimneyDepth,
@@ -87,9 +92,9 @@ public sealed class BlockBuildingGenerator : ITerrainGenerator
             throw new ArgumentException("Width, Depth, and Height must be greater than zero.", nameof(settings));
         }
 
-        if (settings.BaseThickness < 0)
+        if (settings.BaseThickness < 0 || settings.OuterWallThickness < 0)
         {
-            throw new ArgumentException("BaseThickness cannot be negative.", nameof(settings));
+            throw new ArgumentException("BaseThickness and OuterWallThickness cannot be negative.", nameof(settings));
         }
     }
 }
