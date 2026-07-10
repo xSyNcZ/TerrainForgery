@@ -21,6 +21,8 @@ public static class TriangleBudgetResolver
             Width = settings.Width,
             Depth = settings.Depth,
             Height = settings.Height,
+            ScaleMillimeters = settings.ScaleMillimeters,
+            ReferenceMiniatureHeight = settings.ReferenceMiniatureHeight,
             Resolution = resolution,
             NoiseStrength = settings.NoiseStrength,
             Seed = settings.Seed,

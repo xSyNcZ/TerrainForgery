@@ -22,14 +22,22 @@ public partial class MainWindow : Window
     private Point _lastMousePosition;
     private bool _isOrbiting;
     private bool _isPanning;
+    private bool _isDraggingReferenceMiniature;
+    private readonly HashSet<Model3D> _referenceMiniatureModels = new();
     private double _cameraYaw = -45.0;
     private double _cameraPitch = 35.0;
     private double _cameraDistance = 220.0;
     private Point3D _cameraTarget = new(0.0, 0.0, 0.0);
+    private double _referenceMiniatureX;
+    private double _referenceMiniatureY;
+    private bool _referenceMiniatureWasMoved;
+    private double _activeScaleMillimeters = TerrainScaleCalculator.BaselineScaleMillimeters;
+    private TerrainGeneratorType _activeGeneratorType = TerrainGeneratorType.Hill;
 
     public MainWindow()
     {
         InitializeComponent();
+        _activeScaleMillimeters = ReadSelectedScale();
         InitializeScene();
         GeneratePreview();
     }
@@ -44,6 +52,53 @@ public partial class MainWindow : Window
     private void GenerateButton_Click(object sender, RoutedEventArgs e)
     {
         GeneratePreview();
+    }
+
+    private void SettingsControl_Changed(object sender, RoutedEventArgs e)
+    {
+        if (!IsLoaded)
+        {
+            return;
+        }
+
+        GeneratePreview();
+    }
+
+    private void GeneratorComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!IsLoaded)
+        {
+            return;
+        }
+
+        var generatorType = GetSelectedGeneratorType();
+        if (generatorType != _activeGeneratorType)
+        {
+            ApplyGeneratorDimensionPreset(generatorType);
+            _activeGeneratorType = generatorType;
+        }
+
+        GeneratePreview();
+    }
+
+    private void ScaleComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!IsLoaded)
+        {
+            return;
+        }
+
+        ApplyScaleChange();
+    }
+
+    private void CustomScaleTextBox_LostFocus(object sender, RoutedEventArgs e)
+    {
+        if (!IsLoaded || ScaleComboBox.SelectedIndex != 9)
+        {
+            return;
+        }
+
+        ApplyScaleChange();
     }
 
     private void ExportButton_Click(object sender, RoutedEventArgs e)
@@ -83,7 +138,42 @@ public partial class MainWindow : Window
         GeneratePreview();
     }
 
-    private void GeneratePreview()
+    private void ApplyScaleChange()
+    {
+        try
+        {
+            var newScale = ReadSelectedScale();
+            var factor = newScale / _activeScaleMillimeters;
+            ScaleTextBoxValue(WidthTextBox, factor);
+            ScaleTextBoxValue(DepthTextBox, factor);
+            ScaleTextBoxValue(HeightTextBox, factor);
+            ScaleTextBoxValue(ReferenceMiniatureTextBox, factor);
+            ScaleTextBoxValue(NoiseTextBox, factor);
+            ScaleTextBoxValue(BaseThicknessTextBox, factor);
+            ScaleTextBoxValue(OuterWallThicknessTextBox, factor);
+            _referenceMiniatureX *= factor;
+            _referenceMiniatureY *= factor;
+            _activeScaleMillimeters = newScale;
+            if (ScaleComboBox.SelectedIndex != 9)
+            {
+                CustomScaleTextBox.Text = newScale.ToString("0.###", CultureInfo.InvariantCulture);
+            }
+
+            GeneratePreview();
+        }
+        catch (Exception exception)
+        {
+            SetStatus(exception.Message);
+        }
+    }
+
+    private static void ScaleTextBoxValue(TextBox textBox, double factor)
+    {
+        var value = ReadDouble(textBox, textBox.Name);
+        textBox.Text = (value * factor).ToString("0.###", CultureInfo.InvariantCulture);
+    }
+
+    private void GeneratePreview(bool resetCameraAfterGeneration = true)
     {
         try
         {
@@ -94,8 +184,16 @@ public partial class MainWindow : Window
 
             _currentMesh = mesh;
             _currentBounds = MeshBoundsCalculator.Calculate(mesh);
-            RenderMesh(mesh, settings.Style);
-            ResetCamera();
+            AutoPositionReferenceMiniature(settings, _currentBounds);
+            RenderMesh(mesh, settings);
+            if (resetCameraAfterGeneration)
+            {
+                ResetCamera();
+            }
+            else
+            {
+                UpdateCamera();
+            }
             UpdateStats(generatorType, settings, mesh, _currentBounds);
             SetStatus($"Generated {generatorType} mesh with {mesh.Triangles.Count} triangles.");
         }
@@ -113,6 +211,8 @@ public partial class MainWindow : Window
             Width = ReadDouble(WidthTextBox, "Width"),
             Depth = ReadDouble(DepthTextBox, "Depth"),
             Height = ReadDouble(HeightTextBox, "Height"),
+            ScaleMillimeters = TerrainScaleCalculator.BaselineScaleMillimeters,
+            ReferenceMiniatureHeight = ReadDouble(ReferenceMiniatureTextBox, "Reference miniature"),
             Resolution = ReadInt(ResolutionTextBox, "Resolution"),
             TargetTriangleCount = ReadOptionalInt(TargetTriangleCountTextBox, "Target triangles"),
             NoiseStrength = ReadDouble(NoiseTextBox, "Noise strength"),
@@ -121,6 +221,54 @@ public partial class MainWindow : Window
             OuterWallThickness = ReadDouble(OuterWallThicknessTextBox, "Outer wall thickness"),
             IncludeBase = IncludeBaseCheckBox.IsChecked == true,
             Style = GetSelectedStyle()
+        };
+    }
+
+    private void ApplyGeneratorDimensionPreset(TerrainGeneratorType generatorType)
+    {
+        if (generatorType != TerrainGeneratorType.BlockBuilding)
+        {
+            return;
+        }
+
+        var miniatureHeight = Math.Max(1.0, ReadDouble(ReferenceMiniatureTextBox, "Reference miniature"));
+        SetTextBoxValue(WidthTextBox, Math.Max(ReadDouble(WidthTextBox, "Width"), miniatureHeight * 6.0));
+        SetTextBoxValue(DepthTextBox, Math.Max(ReadDouble(DepthTextBox, "Depth"), miniatureHeight * 4.0));
+        SetTextBoxValue(HeightTextBox, Math.Max(ReadDouble(HeightTextBox, "Height"), miniatureHeight * 2.8));
+    }
+
+    private static void SetTextBoxValue(TextBox textBox, double value)
+    {
+        textBox.Text = value.ToString("0.###", CultureInfo.InvariantCulture);
+    }
+
+    private void AutoPositionReferenceMiniature(HillGenerationSettings settings, MeshBounds bounds)
+    {
+        if (_referenceMiniatureWasMoved)
+        {
+            return;
+        }
+
+        var miniatureHeight = Math.Max(4.0, settings.ReferenceMiniatureHeight);
+        var offset = Math.Max(6.0, miniatureHeight * 0.28);
+        _referenceMiniatureX = bounds.MaxX + offset;
+        _referenceMiniatureY = bounds.CenterY;
+    }
+
+    private double ReadSelectedScale()
+    {
+        return ScaleComboBox.SelectedIndex switch
+        {
+            0 => 6.0,
+            1 => 10.0,
+            2 => 15.0,
+            3 => 20.0,
+            4 => 25.0,
+            5 => 28.0,
+            6 => 32.0,
+            7 => 35.0,
+            8 => 54.0,
+            _ => ReadDouble(CustomScaleTextBox, "Custom scale")
         };
     }
 
@@ -191,9 +339,10 @@ public partial class MainWindow : Window
         };
     }
 
-    private void RenderMesh(CoreMesh mesh, TerrainStyle style)
+    private void RenderMesh(CoreMesh mesh, HillGenerationSettings settings)
     {
         _scene.Children.Clear();
+        _referenceMiniatureModels.Clear();
         _scene.Children.Add(new AmbientLight(Color.FromRgb(80, 86, 96)));
         _scene.Children.Add(new DirectionalLight(Colors.White, new Vector3D(-0.45, -0.35, -0.8)));
         if (_currentBounds is not null)
@@ -222,9 +371,10 @@ public partial class MainWindow : Window
             geometry.Normals.Add(normal);
         }
 
-        var material = new DiffuseMaterial(new SolidColorBrush(GetStyleColor(style)));
+        var material = new DiffuseMaterial(new SolidColorBrush(GetStyleColor(settings.Style)));
         var backMaterial = new DiffuseMaterial(new SolidColorBrush(Color.FromRgb(72, 91, 84)));
         _scene.Children.Add(new GeometryModel3D(geometry, material) { BackMaterial = backMaterial });
+        AddReferenceMiniature(settings);
     }
 
     private static Color GetStyleColor(TerrainStyle style)
@@ -239,6 +389,45 @@ public partial class MainWindow : Window
             TerrainStyle.RuggedNatural => Color.FromRgb(126, 116, 96),
             _ => Color.FromRgb(126, 116, 96)
         };
+    }
+
+    private void AddReferenceMiniature(HillGenerationSettings settings)
+    {
+        if (ShowReferenceMiniatureCheckBox.IsChecked != true)
+        {
+            return;
+        }
+
+        var x = _referenceMiniatureX;
+        var y = _referenceMiniatureY;
+        var height = Math.Max(1.0, settings.ReferenceMiniatureHeight);
+        var baseHeight = height * 0.08;
+        var legHeight = height * 0.30;
+        var bodyHeight = height * 0.44;
+        var headSize = height * 0.18;
+        var baseDiameter = Math.Max(1.2, height * 0.32);
+        var footWidth = baseDiameter * 0.24;
+        var torsoWidth = baseDiameter * 0.28;
+        var torsoDepth = baseDiameter * 0.18;
+        var material = new DiffuseMaterial(new SolidColorBrush(Color.FromRgb(221, 84, 70)));
+        var darkMaterial = new DiffuseMaterial(new SolidColorBrush(Color.FromRgb(120, 45, 42)));
+
+        var baseZ = baseHeight / 2.0;
+        var legsZ = baseHeight + legHeight / 2.0;
+        var bodyZ = baseHeight + legHeight + bodyHeight / 2.0;
+        var headZ = height - headSize / 2.0;
+
+        AddReferenceMiniatureModel(CreateBoxModel(x, y, baseZ, baseDiameter, baseDiameter, baseHeight, darkMaterial));
+        AddReferenceMiniatureModel(CreateBoxModel(x - footWidth * 0.35, y, legsZ, footWidth, footWidth, legHeight, material));
+        AddReferenceMiniatureModel(CreateBoxModel(x + footWidth * 0.35, y, legsZ, footWidth, footWidth, legHeight, material));
+        AddReferenceMiniatureModel(CreateBoxModel(x, y, bodyZ, torsoWidth, torsoDepth, bodyHeight, material));
+        AddReferenceMiniatureModel(CreateBoxModel(x, y, headZ, headSize, headSize, headSize, material));
+    }
+
+    private void AddReferenceMiniatureModel(GeometryModel3D model)
+    {
+        _referenceMiniatureModels.Add(model);
+        _scene.Children.Add(model);
     }
 
     private void AddScaleGrid(MeshBounds bounds)
@@ -352,8 +541,28 @@ public partial class MainWindow : Window
 
     private void UpdateStats(TerrainGeneratorType generatorType, HillGenerationSettings settings, CoreMesh mesh, MeshBounds bounds)
     {
+        var selectedScale = ReadSelectedScale();
         GeneratorValueTextBlock.Text = generatorType.ToString();
         StyleValueTextBlock.Text = GetStyleLabel(settings.Style);
+        ScaleValueTextBlock.Text = string.Format(
+            CultureInfo.InvariantCulture,
+            "{0:0.#} mm (x{1:0.###})",
+            selectedScale,
+            TerrainScaleCalculator.GetScaleFactor(selectedScale));
+        ReferenceMiniatureValueTextBlock.Text = ShowReferenceMiniatureCheckBox.IsChecked == true
+            ? string.Format(CultureInfo.InvariantCulture, "{0:0.#} mm", settings.ReferenceMiniatureHeight)
+            : "Hidden";
+        ReferenceMiniaturePositionTextBlock.Text = string.Format(
+            CultureInfo.InvariantCulture,
+            "{0:0.#} x {1:0.#} mm",
+            _referenceMiniatureX,
+            _referenceMiniatureY);
+        FinalDimensionsTextBlock.Text = string.Format(
+            CultureInfo.InvariantCulture,
+            "{0:0.#} x {1:0.#} x {2:0.#} mm",
+            settings.Width,
+            settings.Depth,
+            settings.Height);
         BaseValueTextBlock.Text = settings.IncludeBase ? "With base" : "Without base";
         TriangleCountTextBlock.Text = mesh.Triangles.Count.ToString(CultureInfo.InvariantCulture);
         TargetTriangleCountValueTextBlock.Text = settings.TargetTriangleCount?.ToString(CultureInfo.InvariantCulture) ?? "-";
@@ -414,22 +623,30 @@ public partial class MainWindow : Window
 
     private void PreviewViewport_MouseDown(object sender, MouseButtonEventArgs e)
     {
-        _lastMousePosition = e.GetPosition(this);
-        _isOrbiting = e.ChangedButton == MouseButton.Left;
+        _lastMousePosition = e.GetPosition(PreviewViewport);
+        _isDraggingReferenceMiniature = e.ChangedButton == MouseButton.Left && IsReferenceMiniatureHit(e.GetPosition(PreviewViewport));
+        _isOrbiting = e.ChangedButton == MouseButton.Left && !_isDraggingReferenceMiniature;
         _isPanning = e.ChangedButton == MouseButton.Right || e.ChangedButton == MouseButton.Middle;
         PreviewViewport.CaptureMouse();
     }
 
     private void PreviewViewport_MouseMove(object sender, MouseEventArgs e)
     {
-        if (!_isOrbiting && !_isPanning)
+        if (!_isOrbiting && !_isPanning && !_isDraggingReferenceMiniature)
         {
             return;
         }
 
-        var position = e.GetPosition(this);
+        var position = e.GetPosition(PreviewViewport);
         var delta = position - _lastMousePosition;
         _lastMousePosition = position;
+
+        if (_isDraggingReferenceMiniature)
+        {
+            DragReferenceMiniature(delta);
+            RedrawPreviewWithoutRegeneration();
+            return;
+        }
 
         if (_isOrbiting)
         {
@@ -448,6 +665,7 @@ public partial class MainWindow : Window
     {
         _isOrbiting = false;
         _isPanning = false;
+        _isDraggingReferenceMiniature = false;
         PreviewViewport.ReleaseMouseCapture();
     }
 
@@ -482,6 +700,85 @@ public partial class MainWindow : Window
         var scale = _cameraDistance / Math.Max(PreviewViewport.ActualWidth, 1.0);
         var offset = (-delta.X * scale) * right + (delta.Y * scale) * cameraUp;
         _cameraTarget += offset;
+    }
+
+    private void RedrawPreviewWithoutRegeneration()
+    {
+        if (_currentMesh is null || _currentBounds is null)
+        {
+            return;
+        }
+
+        var settings = ReadSettings();
+        RenderMesh(_currentMesh, settings);
+        UpdateCamera();
+        UpdateStats(GetSelectedGeneratorType(), settings, _currentMesh, _currentBounds);
+    }
+
+    private bool IsReferenceMiniatureHit(Point position)
+    {
+        if (ShowReferenceMiniatureCheckBox.IsChecked != true || _referenceMiniatureModels.Count == 0)
+        {
+            return false;
+        }
+
+        var hit = false;
+        VisualTreeHelper.HitTest(
+            PreviewViewport,
+            null,
+            result =>
+            {
+                if (result is RayHitTestResult rayHit && _referenceMiniatureModels.Contains(rayHit.ModelHit))
+                {
+                    hit = true;
+                    return HitTestResultBehavior.Stop;
+                }
+
+                return HitTestResultBehavior.Continue;
+            },
+            new PointHitTestParameters(position));
+
+        return hit;
+    }
+
+    private void DragReferenceMiniature(Vector delta)
+    {
+        var look = PreviewCamera.LookDirection;
+        if (look.LengthSquared == 0.0)
+        {
+            return;
+        }
+
+        look.Normalize();
+        var up = PreviewCamera.UpDirection;
+        up.Normalize();
+        var right = Vector3D.CrossProduct(look, up);
+        if (right.LengthSquared == 0.0)
+        {
+            return;
+        }
+
+        right.Normalize();
+        var cameraUp = Vector3D.CrossProduct(right, look);
+        cameraUp.Normalize();
+
+        right.Z = 0.0;
+        cameraUp.Z = 0.0;
+        if (right.LengthSquared > 0.0)
+        {
+            right.Normalize();
+        }
+
+        if (cameraUp.LengthSquared > 0.0)
+        {
+            cameraUp.Normalize();
+        }
+
+        var scale = _cameraDistance / Math.Max(PreviewViewport.ActualWidth, 1.0);
+        var offset = (delta.X * scale) * right + (-delta.Y * scale) * cameraUp;
+        _referenceMiniatureX += offset.X;
+        _referenceMiniatureY += offset.Y;
+        _referenceMiniatureWasMoved = true;
     }
 
     private void SetStatus(string message)

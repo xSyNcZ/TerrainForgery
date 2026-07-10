@@ -227,6 +227,37 @@ public sealed class TerrainGeneratorFactoryTests
         Assert.True(bounds.MaxZ <= settings.Height + 0.0001);
     }
 
+    [Fact]
+    public void Generate_ScalePresetChangesGeneratedDimensions()
+    {
+        var baselineSettings = new HillGenerationSettings
+        {
+            Width = 100.0,
+            Depth = 80.0,
+            Height = 20.0,
+            Resolution = 8,
+            IncludeBase = true,
+            ScaleMillimeters = 28.0
+        };
+        var halfScaleSettings = new HillGenerationSettings
+        {
+            Width = 100.0,
+            Depth = 80.0,
+            Height = 20.0,
+            Resolution = 8,
+            IncludeBase = true,
+            ScaleMillimeters = 14.0
+        };
+
+        var baseline = TerrainGeneratorFactory.Create(TerrainGeneratorType.Hill).Generate(baselineSettings);
+        var halfScale = TerrainGeneratorFactory.Create(TerrainGeneratorType.Hill).Generate(halfScaleSettings);
+
+        var baselineBounds = MeshBoundsCalculator.Calculate(baseline);
+        var halfScaleBounds = MeshBoundsCalculator.Calculate(halfScale);
+        Assert.Equal(baselineBounds.Width / 2.0, halfScaleBounds.Width, 3);
+        Assert.Equal(baselineBounds.Depth / 2.0, halfScaleBounds.Depth, 3);
+    }
+
     [Theory]
     [InlineData(TerrainGeneratorType.Hill)]
     [InlineData(TerrainGeneratorType.Crater)]

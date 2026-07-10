@@ -35,10 +35,10 @@
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel Margin="16">
                     <TextBlock Text="BoardMesh Studio" FontSize="24" FontWeight="SemiBold" Foreground="#F3F5F7" />
-                    <TextBlock Text="v0.1 desktop preview" Margin="0,4,0,18" Foreground="#AEB7C2" />
+                    <TextBlock Text="v0.2 scale-aware preview" Margin="0,4,0,18" Foreground="#AEB7C2" />
 
                     <TextBlock Text="Generator" Style="{StaticResource LabelTextBlockStyle}" />
-                    <ComboBox x:Name="GeneratorComboBox" SelectedIndex="0" Margin="0,4,0,12">
+                    <ComboBox x:Name="GeneratorComboBox" SelectedIndex="0" Margin="0,4,0,12" SelectionChanged="GeneratorComboBox_SelectionChanged">
                         <ComboBoxItem Content="Hill" />
                         <ComboBoxItem Content="Crater" />
                         <ComboBoxItem Content="Rock" />
@@ -47,7 +47,7 @@
                     </ComboBox>
 
                     <TextBlock Text="Style" Style="{StaticResource LabelTextBlockStyle}" />
-                    <ComboBox x:Name="StyleComboBox" SelectedIndex="5" Margin="0,4,0,12">
+                    <ComboBox x:Name="StyleComboBox" SelectedIndex="5" Margin="0,4,0,12" SelectionChanged="SettingsControl_Changed">
                         <ComboBoxItem Content="Realistic" />
                         <ComboBoxItem Content="Stylized" />
                         <ComboBoxItem Content="Anime-inspired" />
@@ -55,6 +55,28 @@
                         <ComboBoxItem Content="Low-poly" />
                         <ComboBoxItem Content="Rugged / natural" />
                     </ComboBox>
+
+                    <TextBlock Text="Scale" Style="{StaticResource LabelTextBlockStyle}" />
+                    <ComboBox x:Name="ScaleComboBox" SelectedIndex="5" Margin="0,4,0,8" SelectionChanged="ScaleComboBox_SelectionChanged">
+                        <ComboBoxItem Content="6 mm" />
+                        <ComboBoxItem Content="10 mm" />
+                        <ComboBoxItem Content="15 mm" />
+                        <ComboBoxItem Content="20 mm" />
+                        <ComboBoxItem Content="25 mm" />
+                        <ComboBoxItem Content="28 mm" />
+                        <ComboBoxItem Content="32 mm" />
+                        <ComboBoxItem Content="35 mm" />
+                        <ComboBoxItem Content="54 mm" />
+                        <ComboBoxItem Content="Custom" />
+                    </ComboBox>
+
+                    <TextBlock Text="Custom scale (mm)" Style="{StaticResource LabelTextBlockStyle}" />
+                    <TextBox x:Name="CustomScaleTextBox" Text="28" Margin="0,4,0,10" LostFocus="CustomScaleTextBox_LostFocus" />
+
+                    <TextBlock Text="Reference miniature (mm)" Style="{StaticResource LabelTextBlockStyle}" />
+                    <TextBox x:Name="ReferenceMiniatureTextBox" Text="28" Margin="0,4,0,10" />
+
+                    <CheckBox x:Name="ShowReferenceMiniatureCheckBox" Content="Show reference miniature" IsChecked="True" Foreground="#F3F5F7" Margin="0,2,0,14" Click="SettingsControl_Changed" />
 
                     <TextBlock Text="Width (mm)" Style="{StaticResource LabelTextBlockStyle}" />
                     <TextBox x:Name="WidthTextBox" Text="120" Margin="0,4,0,10" />
@@ -92,7 +114,7 @@
                     <TextBlock Text="Outer wall thickness (mm)" Style="{StaticResource LabelTextBlockStyle}" />
                     <TextBox x:Name="OuterWallThicknessTextBox" Text="3" Margin="0,4,0,10" />
 
-                    <CheckBox x:Name="IncludeBaseCheckBox" Content="Generate with printable base" IsChecked="True" Foreground="#F3F5F7" Margin="0,2,0,18" />
+                    <CheckBox x:Name="IncludeBaseCheckBox" Content="Generate with printable base" IsChecked="True" Foreground="#F3F5F7" Margin="0,2,0,18" Click="SettingsControl_Changed" />
 
                     <Button Content="Generate" Height="34" Click="GenerateButton_Click" />
                     <Button Content="Export STL" Height="34" Margin="0,8,0,0" Click="ExportButton_Click" />
@@ -127,6 +149,18 @@
 
                 <TextBlock Text="Style" Style="{StaticResource LabelTextBlockStyle}" />
                 <TextBlock x:Name="StyleValueTextBlock" Text="Rugged / natural" Style="{StaticResource ValueTextBlockStyle}" />
+
+                <TextBlock Text="Scale" Style="{StaticResource LabelTextBlockStyle}" />
+                <TextBlock x:Name="ScaleValueTextBlock" Text="28 mm" Style="{StaticResource ValueTextBlockStyle}" />
+
+                <TextBlock Text="Reference miniature" Style="{StaticResource LabelTextBlockStyle}" />
+                <TextBlock x:Name="ReferenceMiniatureValueTextBlock" Text="28 mm" Style="{StaticResource ValueTextBlockStyle}" />
+
+                <TextBlock Text="Miniature position" Style="{StaticResource LabelTextBlockStyle}" />
+                <TextBlock x:Name="ReferenceMiniaturePositionTextBlock" Text="0 x 0 mm" Style="{StaticResource ValueTextBlockStyle}" />
+
+                <TextBlock Text="Final dimensions" Style="{StaticResource LabelTextBlockStyle}" />
+                <TextBlock x:Name="FinalDimensionsTextBlock" Text="-" Style="{StaticResource ValueTextBlockStyle}" TextWrapping="Wrap" />
 
                 <TextBlock Text="Base" Style="{StaticResource LabelTextBlockStyle}" />
                 <TextBlock x:Name="BaseValueTextBlock" Text="With base" Style="{StaticResource ValueTextBlockStyle}" />

@@ -23,7 +23,7 @@ The long-term goal is not to become a full 3D modeling suite. BoardMesh Studio s
 | --- | --- | --- | --- |
 | v0.0.1 | MVP-0 | Core STL generation | Completed |
 | v0.1 | Desktop Preview App | Single-object preview and export | Completed |
-| v0.2 | Scale System | Scale-aware generation | Planned |
+| v0.2 | Scale System | Scale-aware generation | Completed |
 | v0.3 | Board Size System | Inch-based board planning | Planned |
 | v0.4 | Terrain Object Library | Terrain metadata and categories | Planned |
 | v0.5 | Genre / Setting System | Thematic generation rules | Planned |
@@ -207,26 +207,30 @@ These patch milestones refine the first desktop preview before the larger scale 
 
 **Scope:**
 
-- Scale presets
-- Custom scale
-- Reference miniature size
-- Base size presets
-- Scale-aware doors, walls, windows, and scatter objects
+- [x] Scale presets
+- [x] Custom scale
+- [x] Optional reference miniature size
+- [x] Reference miniature shown beside the generated object
+- [x] Mouse-dragged reference miniature in the 3D preview
+- [x] Proportional width, depth, height, thickness, and reference-size updates when scale changes
+- [x] Scale-aware doors, walls, windows, and terrain object dimensions
 
 **Scale presets:**
 
-- 6 mm
-- 10 mm
-- 15 mm
-- 20 mm
-- 25 mm
-- 28 mm
-- 32 mm
-- 35 mm
-- 54 mm
-- Custom
+- [x] 6 mm
+- [x] 10 mm
+- [x] 15 mm
+- [x] 20 mm
+- [x] 25 mm
+- [x] 28 mm
+- [x] 32 mm
+- [x] 35 mm
+- [x] 54 mm
+- [x] Custom
 
-Scale must not be only a label. It should affect generated model dimensions.
+Scale must not be only a label. It affects the visible millimeter dimensions used for generation. Board-size presets are intentionally deferred to v0.3, so v0.2 does not use a separate base-size preset that overrides object width and depth.
+
+**Status:** Completed
 
 ### v0.3 - Board Size System
 

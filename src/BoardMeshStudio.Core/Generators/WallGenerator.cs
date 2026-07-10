@@ -6,6 +6,7 @@ public sealed class WallGenerator : ITerrainGenerator
 {
     public Mesh Generate(HillGenerationSettings settings)
     {
+        settings = TerrainScaleCalculator.ApplyToDimensions(settings);
         Validate(settings);
 
         var profile = TerrainStyleProfile.From(settings.Style);

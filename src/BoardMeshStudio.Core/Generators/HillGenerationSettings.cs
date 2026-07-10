@@ -8,6 +8,10 @@ public sealed class HillGenerationSettings
 
     public double Height { get; set; } = 25.0;
 
+    public double ScaleMillimeters { get; set; } = TerrainScaleCalculator.BaselineScaleMillimeters;
+
+    public double ReferenceMiniatureHeight { get; set; } = TerrainScaleCalculator.BaselineScaleMillimeters;
+
     public int Resolution { get; set; } = 32;
 
     public double NoiseStrength { get; set; } = 1.5;

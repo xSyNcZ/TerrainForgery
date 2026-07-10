@@ -6,6 +6,7 @@ public sealed class CraterGenerator : ITerrainGenerator
 {
     public Mesh Generate(HillGenerationSettings settings)
     {
+        settings = TerrainScaleCalculator.ApplyToDimensions(settings);
         settings = TriangleBudgetResolver.Apply(settings);
         Validate(settings);
 

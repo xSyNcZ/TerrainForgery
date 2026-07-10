@@ -23,6 +23,8 @@ public sealed class TriangleBudgetResolverTests
             Width = 42.0,
             Depth = 24.0,
             Height = 12.0,
+            ScaleMillimeters = 32.0,
+            ReferenceMiniatureHeight = 36.0,
             Resolution = 48,
             NoiseStrength = 0.7,
             Seed = 99,
@@ -39,6 +41,8 @@ public sealed class TriangleBudgetResolverTests
         Assert.Equal(settings.Width, resolved.Width);
         Assert.Equal(settings.Depth, resolved.Depth);
         Assert.Equal(settings.Height, resolved.Height);
+        Assert.Equal(settings.ScaleMillimeters, resolved.ScaleMillimeters);
+        Assert.Equal(settings.ReferenceMiniatureHeight, resolved.ReferenceMiniatureHeight);
         Assert.Equal(settings.NoiseStrength, resolved.NoiseStrength);
         Assert.Equal(settings.Seed, resolved.Seed);
         Assert.Equal(settings.BaseThickness, resolved.BaseThickness);

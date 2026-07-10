@@ -6,6 +6,7 @@ public sealed class BlockBuildingGenerator : ITerrainGenerator
 {
     public Mesh Generate(HillGenerationSettings settings)
     {
+        settings = TerrainScaleCalculator.ApplyToDimensions(settings);
         Validate(settings);
 
         var mesh = new Mesh();
@@ -44,10 +45,11 @@ public sealed class BlockBuildingGenerator : ITerrainGenerator
         var detailDepth = Math.Min(0.7, Math.Max(0.25, settings.Depth * 0.025));
         var frontY = -bodyDepth / 2.0 - detailDepth / 2.0;
         var backY = bodyDepth / 2.0 + detailDepth / 2.0;
-        var doorWidth = Math.Max(3.0, bodyWidth * 0.18);
-        var doorHeight = Math.Max(9.0, wallHeight * 0.42);
-        var windowWidth = Math.Max(2.8, bodyWidth * 0.14);
-        var windowHeight = Math.Max(4.0, wallHeight * 0.18);
+        var miniatureHeight = Math.Max(4.0, settings.ReferenceMiniatureHeight);
+        var doorWidth = Math.Clamp(miniatureHeight * 0.28, bodyWidth * 0.12, bodyWidth * 0.32);
+        var doorHeight = Math.Clamp(miniatureHeight * 0.68, wallHeight * 0.35, wallHeight * 0.78);
+        var windowWidth = Math.Clamp(miniatureHeight * 0.22, bodyWidth * 0.09, bodyWidth * 0.24);
+        var windowHeight = Math.Clamp(miniatureHeight * 0.22, wallHeight * 0.12, wallHeight * 0.28);
         var windowZ = Math.Max(doorHeight * 0.75, wallHeight * 0.48);
 
         BoxMeshBuilder.AddBox(mesh, 0.0, frontY, 0.0, doorWidth, detailDepth, doorHeight);

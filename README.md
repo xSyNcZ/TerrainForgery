@@ -26,6 +26,8 @@ The desktop app includes:
 - a parameter panel,
 - terrain generator selection,
 - terrain style presets,
+- scale presets and custom scale that resize current dimensions,
+- optional reference miniature preview with mouse dragging,
 - with-base / without-base generation,
 - smoothed no-base terrain edges,
 - bounds fitting for generated objects,
@@ -47,6 +49,10 @@ Seed digits currently influence terrain character:
 - remaining digits: deterministic noise phase and variation.
 
 Style presets influence shape, smoothness, detail density, and preview color. Current presets are `Realistic`, `Stylized`, `Anime-inspired`, `Miniature-friendly`, `Low-poly`, and `Rugged / natural`.
+
+Scale presets are not just labels. BoardMesh Studio uses 28 mm as the baseline scale. When the selected scale changes, the visible width, depth, height, reference miniature, base thickness, wall thickness, and noise dimensions are proportionally updated in millimeters for 6 mm, 10 mm, 15 mm, 20 mm, 25 mm, 28 mm, 32 mm, 35 mm, 54 mm, or a custom scale.
+
+The reference miniature is optional. When enabled, it appears beside the generated object, defaults to 28 mm at 28 mm scale, can be dragged with the mouse in the 3D preview, and is never included in STL export.
 
 ## Run the CLI
 
