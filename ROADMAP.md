@@ -232,6 +232,98 @@ Scale must not be only a label. It affects the visible millimeter dimensions use
 
 **Status:** Completed
 
+#### v0.2.x - Scale System Refinement Backlog
+
+These patch milestones refine the scale workflow before the larger board-size system starts in v0.3.
+
+| Version | Focus | Status |
+| --- | --- | --- |
+| v0.2.1 | Reference miniature correctness | Completed |
+| v0.2.2 | Scale UI synchronization | Completed |
+| v0.2.3 | Generator-specific scale defaults | Completed |
+| v0.2.4 | Scale validation and warnings | Planned |
+| v0.2.5 | Scale-aware detail presets | Planned |
+| v0.2.6 | Scale comparison tools | Planned |
+
+##### v0.2.1 - Reference Miniature Correctness
+
+**Goal:** make the reference miniature a reliable physical scale reference in the preview.
+
+**Scope:**
+
+- [x] Match the miniature preview mesh height to the `Reference miniature` value.
+- [x] Default to 28 mm for 28 mm scale.
+- [x] Keep the reference miniature out of STL export.
+- [x] Spawn the reference miniature beside the generated object instead of on top of it.
+- [x] Allow the reference miniature to be dragged by mouse in the 3D preview.
+
+**Status:** Completed
+
+##### v0.2.2 - Scale UI Synchronization
+
+**Goal:** make scale controls and displayed dimensions stay in sync.
+
+**Scope:**
+
+- [x] Synchronize the `Custom scale` field with selected scale presets.
+- [x] Proportionally update visible width, depth, height, reference miniature size, base thickness, wall thickness, and noise when scale changes.
+- [x] Show final dimensions and scale factor in the stats panel.
+- [x] Avoid hidden scale multipliers that make UI values differ from generated dimensions.
+
+**Status:** Completed
+
+##### v0.2.3 - Generator-Specific Scale Defaults
+
+**Goal:** give each generator sensible starting dimensions for the selected scale.
+
+**Scope:**
+
+- [x] Prevent `Block building` from starting as a building with roughly human height.
+- [x] Set building minimum dimensions relative to the active reference miniature.
+- [x] Preserve user-edited dimensions when they are already larger than the generator-specific minimum.
+- [x] Keep terrain generators and building generators from sharing unsuitable default proportions.
+
+**Status:** Completed
+
+##### v0.2.4 - Scale Validation and Warnings
+
+**Goal:** warn users when scale and dimensions create physically or visually implausible objects.
+
+**Scope:**
+
+- [ ] Warn when a generated building is too low or too tall relative to the reference miniature.
+- [ ] Warn when doors or windows are unreadable at the selected scale.
+- [ ] Warn when walls, bases, or detail protrusions are likely too thin for printing.
+- [ ] Show warnings in the status or stats panel without blocking generation.
+
+**Status:** Planned
+
+##### v0.2.5 - Scale-Aware Detail Presets
+
+**Goal:** adapt generated detail density and thickness to miniature scale.
+
+**Scope:**
+
+- [ ] Use simpler, thicker details for small scales such as 6 mm and 10 mm.
+- [ ] Use medium detail density for 15 mm, 20 mm, 25 mm, 28 mm, 32 mm, and 35 mm.
+- [ ] Allow richer detail density for 54 mm and custom large scales.
+- [ ] Keep detail presets generic and generator-specific rather than tied to a single style.
+
+**Status:** Planned
+
+##### v0.2.6 - Scale Comparison Tools
+
+**Goal:** make it easier to visually compare object size against common miniature scales.
+
+**Scope:**
+
+- [ ] Add an option to show multiple reference miniatures at once.
+- [ ] Include common comparison sizes such as 6 mm, 28 mm, and 54 mm.
+- [ ] Add a reset action that moves the reference miniature back beside the generated object.
+- [ ] Keep reference comparison helpers preview-only and excluded from STL export.
+
+**Status:** Planned
+
 ### v0.3 - Board Size System
 
 **Goal:** add battlefield board size selection in inches and convert dimensions to millimeters.
